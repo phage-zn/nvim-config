@@ -39,3 +39,4 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Highlight on search
 vim.o.hlsearch = true
+vim.o.colorcolumn = '140'

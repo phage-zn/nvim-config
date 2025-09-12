@@ -38,7 +38,8 @@ local init_options = {
       importModuleSpecifierPreference = 'non-relative',
       importModuleSpecifierEnding = 'minimal',
     },
-  }
+  },
+  vuels = {}
 }
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()

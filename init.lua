@@ -1,6 +1,5 @@
 ---@diagnostic disable: missing-fields
 require("config.neovim-config")
-
 -- LAZY SETUP ---[[ - ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -20,10 +19,9 @@ vim.opt.rtp:prepend(lazypath)
 
 -- PLUGINS CONFIG --
 require("lazy").setup({
+  { "folke/tokyonight.nvim", config = function() vim.cmd.colorscheme "tokyonight" end },
   { import = "plugins" },
 })
-
-vim.cmd [[colorscheme rosebones]]
 
 local wk = require("which-key")
 local keymaps = require("config.keymap-config")
