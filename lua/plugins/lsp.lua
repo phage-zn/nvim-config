@@ -13,6 +13,7 @@ return {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
       "stevearc/conform.nvim",
+      "saghen/blink.cmp"
     },
     config = function()
       local servers = {
@@ -66,8 +67,9 @@ return {
         ensure_installed = vim.tbl_keys(servers),
         handlers = {
           function(server_name)
+            local lsp_capabilities = require('blink.cmp').get_lsp_capabilities(capabilities)
             require('lspconfig')[server_name].setup {
-              capabilities = capabilities,
+              capabilities = lsp_capabilities,
 
               on_attach = require("config.lsp-keymaps").register_lsp_keymaps,
               settings = servers[server_name],
@@ -81,23 +83,31 @@ return {
           end,
         }
       }
-
-      vim.api.nvim_create_autocmd('LspAttach', {
-        callback = function(args)
-          local c = vim.lsp.get_client_by_id(args.data.client_id)
-          if not c then return end
-
-          if vim.bo.filetype == "lua" then
-            -- Format the current buffer on save
-            vim.api.nvim_create_autocmd('BufWritePre', {
-              buffer = args.buf,
-              callback = function()
-                vim.lsp.buf.format({ bufnr = args.buf, id = c.id })
-              end,
-            })
-          end
-        end,
-      })
     end
   },
+  {
+    'saghen/blink.cmp',
+    version = '1.*',
+
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      keymap = { preset = 'default' },
+
+      appearance = { nerd_font_variant = 'mono' },
+
+      completion = {
+        documentation = { auto_show = false },
+        menu = { auto_show = false },
+        ghost_text = { enabled = true },
+      },
+
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+
+      fuzzy = { implementation = "prefer_rust_with_warning" }
+    },
+    opts_extend = { "sources.default" }
+  }
 }

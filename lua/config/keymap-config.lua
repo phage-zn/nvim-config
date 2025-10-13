@@ -19,7 +19,7 @@ return {
   { "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Switch Buffer", mode = "n" },
   { "<leader>u", "<cmd>Telescope undo<cr>", desc = "Undo Tree", mode = "n" },
 
-  { "<A-x>", "<cmd>:lua require(\"mini.bufremove\").delete(0)<cr>", desc = "Delete Current Buffer" },
+  { "<A-x>", "<cmd>bd<cr>", desc = "Delete Current Buffer" },
   { "<A-X>", "<cmd>1,.-bd | .+1,$bd<cr>", desc = "Delete Other Buffers" },
   { "<A-h>", "<cmd>bp<cr>", desc = "Go to Previous Buffer" },
   { "<A-l>", "<cmd>bn<cr>", desc = "Go to Next Buffer" },
