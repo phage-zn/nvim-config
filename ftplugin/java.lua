@@ -13,7 +13,7 @@ local config = {
   -- The command that starts the language server
   -- See: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
   cmd = {
-    vim.fn.expand(jvm .. "java-21-openjdk-amd64/bin/java"),
+    vim.fn.expand(jvm .. "java-21-openjdk/bin/java"),
     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
     "-Dosgi.bundles.defaultStartLevel=4",
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -64,18 +64,18 @@ local config = {
           {
             name = "JavaSE-17",
             path =
-                jvm .. "java-17-openjdk-amd64/",
+                jvm .. "java-17-openjdk/",
             default = true
           },
           {
             name = "JavaSE-1.8",
             path =
-                jvm .. "java-8-openjdk-amd64/",
+                jvm .. "java-8-openjdk/",
           },
           {
             name = "JavaSE-21",
             path =
-                jvm .. "java-21-openjdk-amd64/",
+                jvm .. "java-21-openjdk/",
           },
         },
       },
@@ -89,14 +89,32 @@ local config = {
         onType = {
           enabled = true,
         },
+        settings = {
+          url = vim.fn.expand "$HOME/octopus-eclipse-style.xml"
+        },
       },
       signatureHelp = {
         enabled = true,
+      },
+      cleanup = {
+        actionsOnSave = {
+          "qualifyMembers",
+          "qualifyStaticMembers",
+          "addOverride",
+          "addDeprecated",
+          "stringConcatToTextBlock",
+          "invertEquals",
+          "addFinalModifier",
+          "instanceofPatternMatch",
+          "lambdaExpression",
+          "switchExpression"
+        }
       },
       saveActions = {
         organizeImports = true,
       },
       completion = {
+
         favoriteStaticMembers = {
           "org.hamcrest.MatcherAssert.assertThat",
           "org.hamcrest.Matchers.*",
@@ -117,9 +135,11 @@ local config = {
           "gamesys",
           "gamesys.baltics.games",
           "co.octopus",
-          "com.rogue.common",
-          "com.rogue",
           "estonia_interactive",
+          "com.utilities",
+          "com.rogue.common",
+          "com.rogue.charon",
+          "com.rogue",
           "",
           "#com",
           "#org",
@@ -129,9 +149,11 @@ local config = {
           "#gamesys",
           "#gamesys.baltics.games",
           "#co.octopus",
-          "#com.rogue.common",
-          "#com.rogue",
           "#estonia_interactive",
+          "#com.utilities",
+          "#com.rogue.common",
+          "#com.rogue.charon",
+          "#com.rogue",
           "#",
         }
       },
