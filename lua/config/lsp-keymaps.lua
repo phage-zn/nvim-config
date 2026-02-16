@@ -15,7 +15,6 @@ return {
 
 
   { "g", group = "Go To" },
-  { "gr", "<cmd>Telescope lsp_references<cr>", desc = 'Goto References' },
   { "gd", vim.lsp.buf.definition, desc = 'Goto Definition' },
   { "gj", vim.diagnostic.goto_next, desc = 'Goto Next Diagnostic' },
   { "gk", vim.diagnostic.goto_prev, desc = 'Goto Prev Diagnostic' },
