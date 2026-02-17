@@ -12,8 +12,8 @@ return {
   { "<leader>f*", "<cmd>Telescope builtin<cr>", desc = "All Commands", mode = "n" },
 
   -- Search Functions
-  { "<leader>sw", "<cmd>Telescope grep_string<cr>", desc = "Find Word", mode = "n" },
-  { "<leader>ss", "<cmd>Telescope live_grep<cr>", desc = "Find String", mode = "n" },
+  { "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Find Word", mode = "n" },
+  { "<leader>fs", "<cmd>Telescope live_grep<cr>", desc = "Find String", mode = "n" },
 
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
   { "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Switch Buffer", mode = "n" },
