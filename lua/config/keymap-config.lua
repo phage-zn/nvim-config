@@ -2,7 +2,7 @@ local gs = package.loaded.gitsigns
 
 return {
   { "-", "<cmd>Oil<cr>", desc = "Open Parent Dir" },
-  { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = '' },
+  { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = "" },
 
   -- Telescope Functions
   { "<leader>f", group = "Find" },
@@ -46,12 +46,12 @@ return {
         end
       end
       local message = string.format(notification, count)
-      if (skip_count > 0) then
+      if skip_count > 0 then
         message = message .. string.format(skip_notification, skip_count)
       end
       vim.notify(message)
     end,
-    desc = "Delete Other Buffers"
+    desc = "Delete Other Buffers",
   },
   { "<A-h>", "<cmd>bp<cr>", desc = "Go to Previous Buffer" },
   { "<A-l>", "<cmd>bn<cr>", desc = "Go to Next Buffer" },
@@ -72,13 +72,13 @@ return {
   { "<F7>", "<cmd>ToggleTermToggleAll<cr>", desc = "Toggle Terminal", mode = "nt" },
 
   { "<leader>g", group = "Git" },
-  { "<leader>gb", gs.toggle_current_line_blame, desc = 'Toggle Current Line Blame' },
+  { "<leader>gb", gs.toggle_current_line_blame, desc = "Toggle Current Line Blame" },
   {
     "<leader>gB",
     function()
-      gs.blame_line { full = true }
+      gs.blame_line({ full = true })
     end,
-    desc = 'Toggle Full Line Blame'
+    desc = "Toggle Full Line Blame",
   },
   {
     "<leader>gl",
@@ -87,14 +87,14 @@ return {
       local lazygit = terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
       lazygit:toggle()
     end,
-    desc = "Lazygit"
+    desc = "Lazygit",
   },
   {
     "<leader>gc",
     function()
       gs.show_commit()
     end,
-    desc = "Show commit"
+    desc = "Show commit",
   },
 
   -- Vim Built-In Functions
@@ -110,21 +110,24 @@ return {
   { "\\", "<cmd>split<cr>", desc = "Horizontal Split" },
 
   -- LSP Keymaps
-  { 'K', vim.lsp.buf.hover, desc = 'Hover Documentation' },
+  { "K", vim.lsp.buf.hover, desc = "Hover Documentation" },
 
-  { "<leader>l", group = "LSP", icon = '󱁼' },
-  { "<leader>lf", vim.lsp.buf.format, desc = 'Format Buffer' },
+  { "<leader>l", group = "LSP", icon = "󱁼" },
+  { "<leader>lf", vim.lsp.buf.format, desc = "Format Buffer" },
 
-  { "<leader>lh", '<cmd>lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<cr>', desc = 'Toggle Inlay Hints' },
-  { "<leader>li", '<cmd>LspInfo<cr>', desc = 'LSP Info', icon = "" },
-  { "<leader>l?", vim.lsp.buf.signature_help, desc = 'Signature Help', icon = "󰋖" },
-  { "<leader>ld", "<cmd>Telescope diagnostics<cr>", desc = 'Diagnostics', icon = '' },
-  { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>", desc = 'Document Symbols', icon = '' },
-  { "<leader>lt", "<cmd>Telescope lsp_type_definitions<cr>", desc = 'Type Definition', icon = '' },
-
+  {
+    "<leader>lh",
+    "<cmd>lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<cr>",
+    desc = "Toggle Inlay Hints",
+  },
+  { "<leader>li", "<cmd>LspInfo<cr>", desc = "LSP Info", icon = "" },
+  { "<leader>l?", vim.lsp.buf.signature_help, desc = "Signature Help", icon = "󰋖" },
+  { "<leader>ld", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics", icon = "" },
+  { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols", icon = "" },
+  { "<leader>lt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "Type Definition", icon = "" },
 
   { "g", group = "Go To" },
-  { "gd", vim.lsp.buf.definition, desc = 'Goto Definition' },
-  { "gj", vim.diagnostic.goto_next, desc = 'Goto Next Diagnostic' },
-  { "gk", vim.diagnostic.goto_prev, desc = 'Goto Prev Diagnostic' },
+  { "gd", vim.lsp.buf.definition, desc = "Goto Definition" },
+  { "gj", function () vim.diagnostic.jump({ count = 1, float = true }) end, desc = "Goto Next Diagnostic" },
+  { "gk", function () vim.diagnostic.jump({ count = -1, float = true }) end, desc = "Goto Prev Diagnostic" },
 }
