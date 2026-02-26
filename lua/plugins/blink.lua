@@ -14,12 +14,12 @@ return {
       },
 
       appearance = {
-        nerd_font_variant = 'mono'
+        nerd_font_variant = 'mono',
       },
 
       completion = {
-        documentation = { auto_show = false }
-        ghost_text = { enabled = true }
+        documentation = { auto_show = false },
+        ghost_text = { enabled = true },
       },
 
       sources = {
