@@ -11,4 +11,6 @@ return {
 
   { "g", group = "Go To" },
   { "gd", vim.lsp.buf.definition, desc = 'Goto Definition' },
+  { "gj", function() vim.diagnostic.jump({ count = 1, float = true }) end, desc = 'Goto Next Diagnostic' },
+  { "gk", function() vim.diagnostic.jump({ count = -1, float = true }) end, desc = 'Goto Prev Diagnostic' },
 }

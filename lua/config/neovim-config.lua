@@ -39,4 +39,9 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Highlight on search
 vim.o.hlsearch = true
-vim.o.colorcolumn = '140'
+
+local diagnostic_config = {
+  float = { source = "always" },
+}
+
+vim.diagnostic.config(diagnostic_config)
