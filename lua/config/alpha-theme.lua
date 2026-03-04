@@ -1,4 +1,6 @@
 local utils = require("alpha.utils")
+local target_width = 70
+local btn_padding = 20
 
 local path_ok, plenary_path = pcall(require, "plenary.path")
 if not path_ok then
@@ -32,7 +34,42 @@ local function icon(fn)
   return ico, hl
 end
 
-local function file_button(fn, sc, short_fn, autocd)
+local leader = "SPC"
+
+--- @param shortcut string
+--- @param txt string
+--- @param keybind string? optional
+--- @param keybind_opts table? optional
+local function button(shortcut, txt, keybind, keybind_opts)
+    local sc_ = shortcut:gsub("%s", ""):gsub(leader, "<leader>")
+
+    local opts = {
+        position = "center",
+        shortcut = shortcut,
+        cursor = 3,
+        width = target_width + btn_padding,
+        align_shortcut = "right",
+        hl_shortcut = "Keyword",
+    }
+    if keybind then
+        keybind_opts = if_nil(keybind_opts, { noremap = true, silent = true, nowait = true })
+        opts.keymap = { "n", sc_, keybind, keybind_opts }
+    end
+
+    local function on_press()
+        local key = vim.api.nvim_replace_termcodes(keybind or sc_ .. "<Ignore>", true, false, true)
+        vim.api.nvim_feedkeys(key, "t", false)
+    end
+
+    return {
+        type = "button",
+        val = txt,
+        on_press = on_press,
+        opts = opts,
+    }
+end
+
+local function file_button(fn, shortcut, short_fn, autocd)
   short_fn = short_fn or fn
   local ico_txt
   local fb_hl = {}
@@ -54,7 +91,7 @@ local function file_button(fn, sc, short_fn, autocd)
   end
   local cd_cmd = (autocd and " | cd %:p:h" or "")
   local file_button_el =
-      dashboard.button(sc, ico_txt .. short_fn, "<cmd>e " .. vim.fn.fnameescape(fn) .. cd_cmd .. " <CR>")
+      button(shortcut, ico_txt .. short_fn, "<cmd>e " .. vim.fn.fnameescape(fn) .. cd_cmd .. " <CR>")
   local fn_start = short_fn:match(".*[/\\]")
   if fn_start ~= nil then
     table.insert(fb_hl, { "Comment", #ico_txt - 2, #fn_start + #ico_txt })
@@ -95,7 +132,6 @@ local function mru(start, cwd, items_number, opts)
       oldfiles[#oldfiles + 1] = v
     end
   end
-  local target_width = 35
 
   local tbl = {}
   for i, fn in ipairs(oldfiles) do
@@ -193,6 +229,7 @@ local section = {
   header = header,
   buttons = buttons,
   footer = footer,
+  mru = mru,
 }
 
 local config = {
@@ -223,11 +260,10 @@ local config = {
 
 return {
   section = section,
-  mru = mru,
   config = config,
   -- theme specific config
   mru_opts = mru_opts,
-  leader = dashboard.leader,
+  leader = leader,
   file_icons = file_icons,
   -- deprecated
   nvim_web_devicons = file_icons,
