@@ -20,8 +20,10 @@ local file_icons = {
 
 local function icon(fn)
   if file_icons.provider ~= "devicons" and file_icons.provider ~= "mini" then
-    vim.notify("Alpha: Invalid file icons provider: " .. file_icons.provider .. ", disable file icons",
-      vim.log.levels.WARN)
+    vim.notify(
+      "Alpha: Invalid file icons provider: " .. file_icons.provider .. ", disable file icons",
+      vim.log.levels.WARN
+    )
     file_icons.enabled = false
     return "", ""
   end
@@ -40,42 +42,50 @@ local leader = "SPC"
 --- @param txt string
 --- @param keybind string? optional
 --- @param keybind_opts table? optional
-local function button(shortcut, txt, keybind, keybind_opts)
-    local sc_ = shortcut:gsub("%s", ""):gsub(leader, "<leader>")
+local function button(shortcut, txt, keybind, keybind_opts, align)
+  local sc_ = shortcut:gsub("%s", ""):gsub(leader, "<leader>")
 
-    local opts = {
-        position = "center",
-        shortcut = shortcut,
-        cursor = 3,
-        width = target_width + btn_padding,
-        align_shortcut = "right",
-        hl_shortcut = "Keyword",
-    }
-    if keybind then
-        keybind_opts = if_nil(keybind_opts, { noremap = true, silent = true, nowait = true })
-        opts.keymap = { "n", sc_, keybind, keybind_opts }
-    end
+  local opts = {
+    position = "center",
+    shortcut = shortcut,
+    cursor = 3,
+    width = target_width + btn_padding,
+    align_shortcut = align or "right",
+    hl_shortcut = "Keyword",
+  }
+  if keybind then
+    keybind_opts = if_nil(keybind_opts, { noremap = true, silent = true, nowait = true })
+    opts.keymap = { "n", sc_, keybind, keybind_opts }
+  end
 
-    local function on_press()
-        local key = vim.api.nvim_replace_termcodes(keybind or sc_ .. "<Ignore>", true, false, true)
-        vim.api.nvim_feedkeys(key, "t", false)
-    end
+  local function on_press()
+    local key = vim.api.nvim_replace_termcodes(keybind or sc_ .. "<Ignore>", true, false, true)
+    vim.api.nvim_feedkeys(key, "t", false)
+  end
 
-    return {
-        type = "button",
-        val = txt,
-        on_press = on_press,
-        opts = opts,
-    }
+  return {
+    type = "button",
+    val = txt,
+    on_press = on_press,
+    opts = opts,
+  }
 end
 
-local function file_button(fn, shortcut, short_fn, autocd)
-  short_fn = short_fn or fn
+local function file_button(filepath, shortcut, autocd)
+  local shortened_path = filepath
+  if #shortened_path > target_width then
+    -- target_width = #short_filename
+    shortened_path = plenary_path.new(shortened_path):shorten(1, { -3, -2, -1 })
+    if #shortened_path > target_width then
+      shortened_path = plenary_path.new(shortened_path):shorten(1, { -1 })
+    end
+  end
+
   local ico_txt
   local fb_hl = {}
 
   if file_icons.enabled then
-    local ico, hl = icon(fn)
+    local ico, hl = icon(filepath)
     local hl_option_type = type(file_icons.highlight)
     if hl_option_type == "boolean" then
       if hl and file_icons.highlight then
@@ -85,14 +95,19 @@ local function file_button(fn, shortcut, short_fn, autocd)
     if hl_option_type == "string" then
       table.insert(fb_hl, { file_icons.highlight, 0, #ico })
     end
-    ico_txt = ico .. "  "
+    ico_txt = "  " .. ico .. "  "
   else
     ico_txt = ""
   end
   local cd_cmd = (autocd and " | cd %:p:h" or "")
-  local file_button_el =
-      button(shortcut, ico_txt .. short_fn, "<cmd>e " .. vim.fn.fnameescape(fn) .. cd_cmd .. " <CR>")
-  local fn_start = short_fn:match(".*[/\\]")
+  local file_button_el = button(
+    shortcut,
+    ico_txt .. shortened_path,
+    "<cmd>e " .. vim.fn.fnameescape(filepath) .. cd_cmd .. " <CR>",
+    nil,
+    "left"
+  )
+  local fn_start = shortened_path:match(".*[/\\]")
   if fn_start ~= nil then
     table.insert(fb_hl, { "Comment", #ico_txt - 2, #fn_start + #ico_txt })
   end
@@ -134,25 +149,16 @@ local function get_recent_files(start, cwd, items_number, opts)
   end
 
   local tbl = {}
-  for i, filename in ipairs(oldfiles) do
-    local short_filename
+  for i, filepath in ipairs(oldfiles) do
+    local short_filepath
     if cwd then
-      short_filename = vim.fn.fnamemodify(filename, ":.")
+      short_filepath = vim.fn.fnamemodify(filepath, ":.")
     else
-      short_filename = vim.fn.fnamemodify(filename, ":~")
+      short_filepath = vim.fn.fnamemodify(filepath, ":~")
     end
-
-    if #short_filename > target_width then
-      -- target_width = #short_filename
-      short_filename = plenary_path.new(short_filename):shorten(1, { -3, -2, -1 })
-      if #short_filename > target_width then
-        short_filename = plenary_path.new(short_filename):shorten(1, { -1 })
-      end
-    end
-
     local shortcut = tostring(i + start - 1)
 
-    local file_button_el = file_button(filename, shortcut, short_filename, opts.autocd)
+    local file_button_el = file_button(short_filepath, shortcut, opts.autocd)
     tbl[i] = file_button_el
   end
   return {
@@ -206,23 +212,23 @@ local buttons = {
   val = {
     { type = "text",    val = "Quick links", opts = { hl = "SpecialComment", position = "center" } },
     { type = "padding", val = 1 },
-    dashboard.button("e", "  New file", "<cmd>ene<CR>"),
-    dashboard.button("SPC f f", "󰈞  Find file"),
-    dashboard.button("SPC f s", "󰊄  Find string"),
-    dashboard.button("c", "  Configuration", "<cmd>exe 'cd' stdpath('config')<CR>"),
-    dashboard.button("u", "  Update plugins", "<cmd>Lazy sync<CR>"),
-    dashboard.button("q", "󰅚  Quit", "<cmd>qa<CR>"),
+    button("e", "  New file", "<cmd>ene<CR>"),
+    button("SPC f f", "󰈞  Find file"),
+    button("SPC f s", "󰊄  Find string"),
+    button("c", "  Configuration", "<cmd>exe 'cd' stdpath('config')<CR>"),
+    button("u", "  Update plugins", "<cmd>Lazy sync<CR>"),
+    button("q", "󰅚  Quit", "<cmd>qa<CR>"),
   },
   position = "center",
 }
 
 local footer = {
-    type = "text",
-    val = "",
-    opts = {
-        position = "center",
-        hl = "Number",
-    },
+  type = "text",
+  val = "",
+  opts = {
+    position = "center",
+    hl = "Number",
+  },
 }
 
 local section = {
@@ -241,17 +247,17 @@ local config = {
     { type = "padding", val = 2 },
     section.buttons,
     { type = "padding", val = 2 },
-    section.footer
+    section.footer,
   },
   opts = {
     margin = 5,
     setup = function()
-      vim.api.nvim_create_autocmd('DirChanged', {
-        pattern = '*',
+      vim.api.nvim_create_autocmd("DirChanged", {
+        pattern = "*",
         group = "alpha_temp",
         callback = function()
-          require('alpha').redraw()
-          vim.cmd('AlphaRemap')
+          require("alpha").redraw()
+          vim.cmd("AlphaRemap")
         end,
       })
     end,
