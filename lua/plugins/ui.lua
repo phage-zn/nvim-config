@@ -29,7 +29,7 @@ return {
       ]]
       local function get_fortune()
         if command_exists("fortune") and command_exists("cowsay") then
-          local handle = io.popen("fortune -s | cowsay")
+          local handle = io.popen("fortune -s | cowthink -f $(find /usr/share/cowsay -type f | shuf -n 1)")
           if handle then
             local result = handle:read("*a")
             handle:close()
@@ -39,7 +39,7 @@ return {
         return ""
       end
       theme.section.header.val = vim.split(logo, "\n")
-      -- startify.section.footer.val = vim.split(get_fortune(), "\n")
+      theme.section.footer.val = vim.split(get_fortune(), "\n")
       require("alpha").setup(theme.config)
     end
   },

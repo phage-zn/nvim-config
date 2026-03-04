@@ -180,14 +180,31 @@ local buttons = {
   position = "center",
 }
 
+local footer = {
+    type = "text",
+    val = "",
+    opts = {
+        position = "center",
+        hl = "Number",
+    },
+}
+
+local section = {
+  header = header,
+  buttons = buttons,
+  footer = footer,
+}
+
 local config = {
   layout = {
     { type = "padding", val = 2 },
-    header,
+    section.header,
     { type = "padding", val = 2 },
     section_mru,
     { type = "padding", val = 2 },
-    buttons,
+    section.buttons,
+    { type = "padding", val = 2 },
+    section.footer
   },
   opts = {
     margin = 5,
@@ -202,11 +219,6 @@ local config = {
       })
     end,
   },
-}
-
-local section = {
-  header = header,
-  buttons = buttons,
 }
 
 return {
