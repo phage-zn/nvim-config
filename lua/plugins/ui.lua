@@ -9,6 +9,12 @@ return {
       require("alpha").setup(require("alpha.themes.startify").config)
     end
   },
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000,
+    config = function ()
+      vim.cmd.colorscheme "catppuccin-macchiato"
+    end
+  },
+  -- { "folke/tokyonight.nvim", config = function() vim.cmd.colorscheme "tokyonight" end },
   {
     "zenbones-theme/zenbones.nvim",
     -- Optionally install Lush. Allows for more configuration or extending the colorscheme
