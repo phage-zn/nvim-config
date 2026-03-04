@@ -3,7 +3,7 @@ local root_dir = require("jdtls.setup").find_root(root_markers)
 -- calculate workspace dir
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.fn.stdpath "data" .. "/site/java/workspace-root/" .. project_name
-os.execute("mkdir " .. workspace_dir)
+vim.fn.mkdir(workspace_dir, "p")
 local jdtls = require('jdtls')
 local jvm = "/usr/lib/jvm/"
 
