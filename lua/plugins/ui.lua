@@ -6,11 +6,48 @@ return {
       'nvim-lua/plenary.nvim'
     },
     config = function()
-      require("alpha").setup(require("alpha.themes.startify").config)
+      local theme = require("config.alpha-theme")
+      local function command_exists(cmd)
+        local handle = io.popen("which " .. cmd .. " 2>/dev/null")
+        if handle then
+          local result = handle:read("*a")
+          handle:close()
+          return result ~= ""
+        end
+        return false
+      end
+
+      local logo = [[
+ ██████   █████ ██████████    ███████    █████   █████ █████ ██████   ██████
+░░██████ ░░███ ░░███░░░░░█  ███░░░░░███ ░░███   ░░███ ░░███ ░░██████ ██████
+ ░███░███ ░███  ░███  █ ░  ███     ░░███ ░███    ░███  ░███  ░███░█████░███
+ ░███░░███░███  ░██████   ░███      ░███ ░███    ░███  ░███  ░███░░███ ░███
+ ░███ ░░██████  ░███░░█   ░███      ░███ ░░███   ███   ░███  ░███ ░░░  ░███
+ ░███  ░░█████  ░███ ░   █░░███     ███   ░░░█████░    ░███  ░███      ░███
+ █████  ░░█████ ██████████ ░░░███████░      ░░███      █████ █████     █████
+░░░░░    ░░░░░ ░░░░░░░░░░    ░░░░░░░         ░░░      ░░░░░ ░░░░░     ░░░░░
+      ]]
+      local function get_fortune()
+        if command_exists("fortune") and command_exists("cowsay") then
+          local handle = io.popen("fortune -s | cowsay")
+          if handle then
+            local result = handle:read("*a")
+            handle:close()
+            return result
+          end
+        end
+        return ""
+      end
+      theme.section.header.val = vim.split(logo, "\n")
+      -- startify.section.footer.val = vim.split(get_fortune(), "\n")
+      require("alpha").setup(theme.config)
     end
   },
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000,
-    config = function ()
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
+    config = function()
       vim.cmd.colorscheme "catppuccin-macchiato"
     end
   },
