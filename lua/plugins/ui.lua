@@ -1,9 +1,9 @@
 return {
   {
-    'goolord/alpha-nvim',
+    "goolord/alpha-nvim",
     dependencies = {
-      'nvim-tree/nvim-web-devicons',
-      'nvim-lua/plenary.nvim'
+      "nvim-tree/nvim-web-devicons",
+      "nvim-lua/plenary.nvim",
     },
     config = function()
       local theme = require("config.alpha-theme")
@@ -28,28 +28,35 @@ return {
 ░░░░░    ░░░░░ ░░░░░░░░░░    ░░░░░░░         ░░░      ░░░░░ ░░░░░     ░░░░░
       ]]
       local function get_fortune()
-        if command_exists("fortune") and command_exists("cowsay") then
-          local handle = io.popen("fortune -s | cowthink -f $(find /usr/share/cowsay -type f | shuf -n 1)")
+        local result = "Nothing going on here..."
+        if command_exists("fortune") then
+          local handle = io.popen("fortune -s")
           if handle then
-            local result = handle:read("*a")
+            result = handle:read("*a")
             handle:close()
-            return result
           end
         end
-        return ""
+        if command_exists("cowthink") then
+          local handle = io.popen('cowthink -f $(find /usr/share/cowsay -type f | shuf -n 1) "' .. result .. '"')
+          if handle then
+            result = handle:read("*a")
+            handle:close()
+          end
+        end
+        return result
       end
       theme.section.header.val = vim.split(logo, "\n")
       theme.section.footer.val = vim.split(get_fortune(), "\n")
       require("alpha").setup(theme.config)
-    end
+    end,
   },
   {
     "catppuccin/nvim",
     name = "catppuccin",
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme "catppuccin-macchiato"
-    end
+      vim.cmd.colorscheme("catppuccin-mocha")
+    end,
   },
   -- { "folke/tokyonight.nvim", config = function() vim.cmd.colorscheme "tokyonight" end },
   {
@@ -57,57 +64,58 @@ return {
     -- Optionally install Lush. Allows for more configuration or extending the colorscheme
     -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
     -- In Vim, compat mode is turned on as Lush only works in Neovim.
-    dependencies = "rktjmp/lush.nvim"
+    dependencies = "rktjmp/lush.nvim",
   },
   {
-    'lewis6991/gitsigns.nvim',
+    "lewis6991/gitsigns.nvim",
     config = function()
       require("gitsigns").setup(require("config.gitsigns-config"))
-    end
+    end,
   },
   {
-    'stevearc/dressing.nvim', opts = {},
+    "stevearc/dressing.nvim",
+    opts = {},
   },
   {
-    'b0o/incline.nvim',
+    "b0o/incline.nvim",
     config = function()
-      require('incline').setup()
+      require("incline").setup()
     end,
     -- Optional: Lazy load Incline
-    event = 'VeryLazy',
+    event = "VeryLazy",
   },
   {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       local lualine_require = require("lualine_require")
       lualine_require.require = require
 
       vim.o.laststatus = vim.g.lualine_laststatus
-      require('lualine').setup(require("config.lualine-config"))
-    end
+      require("lualine").setup(require("config.lualine-config"))
+    end,
   },
   {
-    'folke/which-key.nvim',
-    event = 'VeryLazy',
+    "folke/which-key.nvim",
+    event = "VeryLazy",
     opts = {
       preset = "helix",
-    }
+    },
   },
   {
-    'folke/todo-comments.nvim',
+    "folke/todo-comments.nvim",
     dependencies = {
-      'nvim-lua/plenary.nvim'
+      "nvim-lua/plenary.nvim",
     },
     opts = {
-      signs = true
-    }
+      signs = true,
+    },
   },
   {
-    'folke/trouble.nvim',
+    "folke/trouble.nvim",
     dependencies = {
-      'nvim-tree/nvim-web-devicons'
+      "nvim-tree/nvim-web-devicons",
     },
     opts = {},
-  }
+  },
 }

@@ -1,6 +1,6 @@
 local utils = require("alpha.utils")
-local target_width = 70
-local btn_padding = 20
+local target_width = 50
+local btn_padding = 10
 
 local path_ok, plenary_path = pcall(require, "plenary.path")
 if not path_ok then
@@ -102,7 +102,7 @@ end
 
 local default_mru_ignore = { "gitcommit" }
 
-local mru_opts = {
+local get_recent_files_opts = {
   ignore = function(path, ext)
     return (string.find(path, "COMMIT_EDITMSG")) or (vim.tbl_contains(default_mru_ignore, ext))
   end,
@@ -112,8 +112,8 @@ local mru_opts = {
 --- @param start number
 --- @param cwd string? optional
 --- @param items_number number? optional number of items to generate, default = 10
-local function mru(start, cwd, items_number, opts)
-  opts = opts or mru_opts
+local function get_recent_files(start, cwd, items_number, opts)
+  opts = opts or get_recent_files_opts
   items_number = if_nil(items_number, 10)
 
   local oldfiles = {}
@@ -134,24 +134,25 @@ local function mru(start, cwd, items_number, opts)
   end
 
   local tbl = {}
-  for i, fn in ipairs(oldfiles) do
-    local short_fn
+  for i, filename in ipairs(oldfiles) do
+    local short_filename
     if cwd then
-      short_fn = vim.fn.fnamemodify(fn, ":.")
+      short_filename = vim.fn.fnamemodify(filename, ":.")
     else
-      short_fn = vim.fn.fnamemodify(fn, ":~")
+      short_filename = vim.fn.fnamemodify(filename, ":~")
     end
 
-    if #short_fn > target_width then
-      short_fn = plenary_path.new(short_fn):shorten(1, { -2, -1 })
-      if #short_fn > target_width then
-        short_fn = plenary_path.new(short_fn):shorten(1, { -1 })
+    if #short_filename > target_width then
+      -- target_width = #short_filename
+      short_filename = plenary_path.new(short_filename):shorten(1, { -3, -2, -1 })
+      if #short_filename > target_width then
+        short_filename = plenary_path.new(short_filename):shorten(1, { -1 })
       end
     end
 
     local shortcut = tostring(i + start - 1)
 
-    local file_button_el = file_button(fn, shortcut, short_fn, opts.autocd)
+    local file_button_el = file_button(filename, shortcut, short_filename, opts.autocd)
     tbl[i] = file_button_el
   end
   return {
@@ -174,7 +175,6 @@ local header = {
   opts = {
     position = "center",
     hl = "Type",
-    -- wrap = "overflow";
   },
 }
 
@@ -194,7 +194,7 @@ local section_mru = {
     {
       type = "group",
       val = function()
-        return { mru(0, vim.fn.getcwd()) }
+        return { get_recent_files(0, vim.fn.getcwd()) }
       end,
       opts = { shrink_margin = false },
     },
@@ -229,7 +229,7 @@ local section = {
   header = header,
   buttons = buttons,
   footer = footer,
-  mru = mru,
+  mru = get_recent_files,
 }
 
 local config = {
@@ -262,7 +262,7 @@ return {
   section = section,
   config = config,
   -- theme specific config
-  mru_opts = mru_opts,
+  mru_opts = get_recent_files_opts,
   leader = leader,
   file_icons = file_icons,
   -- deprecated
