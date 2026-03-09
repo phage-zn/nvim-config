@@ -114,7 +114,6 @@ local config = {
         organizeImports = true,
       },
       completion = {
-
         favoriteStaticMembers = {
           "org.hamcrest.MatcherAssert.assertThat",
           "org.hamcrest.Matchers.*",
