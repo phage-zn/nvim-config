@@ -96,7 +96,7 @@ return {
     function()
       gs.diffthis('~')
     end,
-    desc = "Diff this from HEAD"
+    desc = "Diff this from previous commit"
   },
 
   -- Vim Built-In Functions
