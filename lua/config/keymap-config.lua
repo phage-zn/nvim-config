@@ -88,12 +88,14 @@ return {
     end,
     desc = "Lazygit"
   },
+  { "<leader>gc", gs.show_commit, desc = "Show commit" },
+  { "<leader>gd", gs.diffthis,    desc = "Diff this" },
   {
-    "<leader>gc",
+    "<leader>gD",
     function()
-      gs.show_commit()
+      gs.diffthis('~')
     end,
-    desc = "Show commit"
+    desc = "Diff this from HEAD"
   },
 
   -- Vim Built-In Functions
