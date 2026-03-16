@@ -71,14 +71,15 @@ return {
   { "<F7>", "<cmd>ToggleTermToggleAll<cr>", desc = "Toggle Terminal", mode = "nt" },
 
   { "<leader>g", group = "Git" },
-  { "<leader>gb", gs.toggle_current_line_blame, desc = 'Toggle Current Line Blame' },
+  { "<leader>gx", gs.toggle_current_line_blame, desc = 'Toggle Current Line Blame' },
   {
-    "<leader>gB",
+    "<leader>gb",
     function()
       gs.blame_line { full = true }
     end,
-    desc = 'Toggle Full Line Blame'
+    desc = 'Blame Line'
   },
+  { "<leader>gB", gs.blame, desc = "Blame buffer" },
   {
     "<leader>gl",
     function()
