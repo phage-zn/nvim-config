@@ -1,8 +1,8 @@
 return {
   options = {
     theme = "auto",
-    component_separators = { left = '', right = '' },
-    section_separators = { left = '', right = '' },
+    component_separators = { left = "", right = "" },
+    section_separators = { left = "", right = "" },
     globalstatus = true,
     disabled_filetypes = { statusline = { "dashboard", "alpha", "starter", "oil" } },
   },
@@ -15,40 +15,30 @@ return {
           local terminal = require("toggleterm.terminal").Terminal
           local lazygit = terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
           lazygit:toggle()
-        end
-      }
+        end,
+      },
     },
     lualine_c = {
       {
         "filetype",
         icon_only = true,
         separator = "",
-        padding = { left = 1, right = 0 }
+        padding = { left = 1, right = 0 },
       },
       {
         "filename",
         on_click = function()
           vim.cmd(":Oil")
-        end
+        end,
       },
       {
         "diagnostics",
-        on_click = function ()
+        on_click = function()
           vim.cmd(":Trouble diagnostics toggle filter.buf=0")
-        end
+        end,
       },
     },
     lualine_x = {
-      -- stylua: ignore
-      {
-        function() return require("noice").api.status.command.get() end,
-        cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-      },
-      -- stylua: ignore
-      {
-        function() return require("noice").api.status.mode.get() end,
-        cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-      },
       -- stylua: ignore
       {
         function() return "  " .. require("dap").status() end,
@@ -82,5 +72,5 @@ return {
       end,
     },
   },
-  extensions = { "neo-tree", "lazy" },
+  extensions = { "lazy" },
 }
