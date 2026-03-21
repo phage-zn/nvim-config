@@ -4,13 +4,14 @@ return {
   { "-", "<cmd>Oil<cr>", desc = "Open Parent Dir" },
   { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = "" },
 
-  -- Telescope Functions
   { "<leader>f", group = "Find" },
   { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find File", mode = "n" },
   { "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Find Word", mode = "n" },
   { "<leader>fs", "<cmd>Telescope live_grep<cr>", desc = "Find String", mode = "n" },
   { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files", mode = "n" },
   { "<leader>fc", "<cmd>Telescope colorscheme<cr>", desc = "Color Scheme", mode = "n" },
+  { "<leader>fm", "<cmd>Telescope marks<cr>", desc = "Mark List", mode = "n" },
+  { "<leader>fj", "<cmd>Telescope jumplist<cr>", desc = "Jump List", mode = "n" },
   { "<leader>f*", "<cmd>Telescope builtin<cr>", desc = "All Commands", mode = "n" },
 
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
@@ -74,9 +75,9 @@ return {
     end,
     desc = "Delete Other Buffers",
   },
-  { "<A-h>", "<cmd>bp<cr>", desc = "Go to Previous Buffer" },
-  { "<A-l>", "<cmd>bn<cr>", desc = "Go to Next Buffer" },
-  { "<A-b>", "<cmd>Telescope buffers<cr>", desc = "List Buffers", mode = "n" },
+  { "<A-h>", "<cmd>bp<cr>",                desc = "Go to Previous Buffer" },
+  { "<A-l>", "<cmd>bn<cr>",                desc = "Go to Next Buffer" },
+  { "<A-b>", "<cmd>Telescope buffers<cr>", desc = "List Buffers",         mode = "n" },
   {
     "<A-s>",
     function()
@@ -87,7 +88,17 @@ return {
     end,
     desc = "New Scratch Buffer",
   },
-  { "<A-o>", "<cmd>e#<cr>", desc = "Toggle Last Active Buffer" },
+  {
+    "<A-o>",
+    function()
+      if vim.fn.bufnr("#") ~= -1 then
+        vim.cmd("e#")
+      else
+        vim.notify("No alternate buffer")
+      end
+    end,
+    desc = "Toggle Last Active Buffer",
+  },
   { "<A-t>", "<cmd>tabnew<cr>", desc = "Create New Tab" },
   { "<A-w>", "<cmd>tabc<cr>", desc = "Close Tab" },
 
@@ -133,10 +144,45 @@ return {
     desc = "Diff this from previous commit",
   },
 
+  { "<leader>q",  group = "Quickfix" },
+  { "<leader>qo", "<cmd>copen<cr>",    desc = "Open" },
+  { "<leader>qc", "<cmd>cclose<cr>",   desc = "Close" },
+  { "<leader>qn", "<cmd>cnext<cr>",    desc = "Next" },
+  { "<leader>qp", "<cmd>cprev<cr>",    desc = "Prev" },
+  { "<leader>qh", "<cmd>chistory<cr>", desc = "History" },
+  {
+    "<leader>qd",
+    function()
+      local cmd = vim.fn.input("cdo: ")
+      if cmd ~= "" then
+        vim.cmd("cdo " .. cmd)
+      end
+    end,
+    desc = "Run cmd on each item",
+  },
+  {
+    "<leader>qf",
+    function()
+      local cmd = vim.fn.input("cfdo: ")
+      if cmd ~= "" then
+        vim.cmd("cfdo " .. cmd)
+      end
+    end,
+    desc = "Run cmd on each file",
+  },
+  {
+    "<leader>qa",
+    function()
+      vim.fn.setqflist({ { filename = vim.fn.expand("%"), lnum = vim.fn.line("."), text = vim.fn.getline(".") } }, "a")
+    end,
+    desc = "Add current line to quickfix",
+  },
+  { "gq",     "<cmd>cnext<cr>",        desc = "Next Quickfix Item" },
+  { "gQ",     "<cmd>cprev<cr>",        desc = "Prev Quickfix Item" },
+
   -- Vim Built-In Functions
   { "<Esc>",  "<cmd>nohlsearch<cr>",   desc = "Clear Highlights" },
-  { "<C-s>",  "<cmd>w<cr>",            desc = "Write" },
-  { "<C-s>a", "<cmd>wa<cr>",           desc = "Write All" },
+  { "<C-s>",  "<cmd>w<cr>",            desc = "Write Buffer" },
   { "<C-q>w", "<cmd>confirm q<cr>",    desc = "Confirm Quit Window" },
   { "<C-q>q", "<cmd>confirm qall<cr>", desc = "Confirm Quit All" },
   { "<C-q>f", "<cmd>qa!<cr>",          desc = "Force Quit" },
