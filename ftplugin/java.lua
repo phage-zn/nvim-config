@@ -164,11 +164,6 @@ local config = {
       },
     },
   },
-  on_attach = function()
-    local keymaps = require("config.lsp-keymaps")
-    require("which-key").add(keymaps)
-  end,
-
 
   -- Language server `initializationOptions`
   -- You need to extend the `bundles` with paths to jar files
