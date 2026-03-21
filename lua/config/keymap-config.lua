@@ -2,7 +2,7 @@ local gs = package.loaded.gitsigns
 
 return {
   { "-", "<cmd>Oil<cr>", desc = "Open Parent Dir" },
-  { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = '' },
+  { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = "" },
 
   -- Telescope Functions
   { "<leader>f", group = "Find" },
@@ -14,10 +14,33 @@ return {
   { "<leader>f*", "<cmd>Telescope builtin<cr>", desc = "All Commands", mode = "n" },
 
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
-  { "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Switch Buffer", mode = "n" },
   { "<leader>u", "<cmd>Telescope undo<cr>", desc = "Undo Tree", mode = "n" },
 
-  { "<A-x>", "<cmd>bp | bd #<cr>", desc = "Delete Current Buffer" },
+  {
+    "<A-x>",
+    function()
+      local buf = vim.api.nvim_get_current_buf()
+      local buf_info = vim.fn.getbufinfo(buf)[1]
+      local buffers = vim.fn.getbufinfo({ buflisted = 1 })
+
+      local has_other = #buffers > 1
+
+      if buf_info.changed == 1 then
+        local response = vim.fn.input("Close modified buffer '" .. buf_info.name .. "'? (Y/n): ")
+        if not (response == "" or response:lower() == "y") then
+          vim.notify("Skipped: " .. buf_info.name)
+          return
+        end
+      end
+
+      if has_other then
+        vim.cmd("bp")
+      end
+
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end,
+    desc = "Delete Current Buffer",
+  },
   {
     "<A-X>",
     function()
@@ -44,15 +67,26 @@ return {
         end
       end
       local message = string.format(notification, count)
-      if (skip_count > 0) then
+      if skip_count > 0 then
         message = message .. string.format(skip_notification, skip_count)
       end
       vim.notify(message)
     end,
-    desc = "Delete Other Buffers"
+    desc = "Delete Other Buffers",
   },
   { "<A-h>", "<cmd>bp<cr>", desc = "Go to Previous Buffer" },
   { "<A-l>", "<cmd>bn<cr>", desc = "Go to Next Buffer" },
+  { "<A-b>", "<cmd>Telescope buffers<cr>", desc = "List Buffers", mode = "n" },
+  {
+    "<A-s>",
+    function()
+      vim.cmd("enew")
+      vim.bo.buftype = "nofile"
+      vim.bo.bufhidden = "wipe"
+      vim.bo.buflisted = true
+    end,
+    desc = "New Scratch Buffer",
+  },
   { "<A-o>", "<cmd>e#<cr>", desc = "Toggle Last Active Buffer" },
   { "<A-t>", "<cmd>tabnew<cr>", desc = "Create New Tab" },
   { "<A-w>", "<cmd>tabc<cr>", desc = "Close Tab" },
@@ -71,15 +105,15 @@ return {
   { "<F7>", "<cmd>ToggleTermToggleAll<cr>", desc = "Toggle Terminal", mode = "nt" },
 
   { "<leader>g", group = "Git" },
-  { "<leader>gx", gs.toggle_current_line_blame, desc = 'Toggle Current Line Blame' },
+  { "<leader>gx", gs.toggle_current_line_blame, desc = "Toggle Current Line Blame" },
   {
     "<leader>gb",
     function()
-      gs.blame_line { full = true }
+      gs.blame_line({ full = true })
     end,
-    desc = 'Blame Line'
+    desc = "Blame Line",
   },
-  { "<leader>gB", gs.blame, desc = "Blame buffer" },
+  { "<leader>gB", gs.blame,       desc = "Blame buffer" },
   {
     "<leader>gl",
     function()
@@ -87,23 +121,22 @@ return {
       local lazygit = terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
       lazygit:toggle()
     end,
-    desc = "Lazygit"
+    desc = "Lazygit",
   },
   { "<leader>gc", gs.show_commit, desc = "Show commit" },
   { "<leader>gd", gs.diffthis,    desc = "Diff this" },
   {
     "<leader>gD",
     function()
-      gs.diffthis('~')
+      gs.diffthis("~")
     end,
-    desc = "Diff this from previous commit"
+    desc = "Diff this from previous commit",
   },
 
   -- Vim Built-In Functions
   { "<Esc>",  "<cmd>nohlsearch<cr>",   desc = "Clear Highlights" },
   { "<C-s>",  "<cmd>w<cr>",            desc = "Write" },
   { "<C-s>a", "<cmd>wa<cr>",           desc = "Write All" },
-  { "<C-q>b", "<cmd>confirm bd<cr>",   desc = "Confirm Quit Buffer" },
   { "<C-q>w", "<cmd>confirm q<cr>",    desc = "Confirm Quit Window" },
   { "<C-q>q", "<cmd>confirm qall<cr>", desc = "Confirm Quit All" },
   { "<C-q>f", "<cmd>qa!<cr>",          desc = "Force Quit" },
