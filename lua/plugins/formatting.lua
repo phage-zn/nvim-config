@@ -1,23 +1,22 @@
 return {
-  { 'numToStr/Comment.nvim', opts = {} },
   {
-    'nvim-mini/mini.ai',
-    version = '*',
+    "nvim-mini/mini.ai",
+    version = "*",
     config = function()
-      local miniConfig = require("config.mini-config");
+      local miniConfig = require("config.mini-config")
       require("mini.ai").setup(miniConfig.ai)
-    end
+    end,
   },
   {
-    'nvim-mini/mini.surround',
-    version = '*',
+    "nvim-mini/mini.surround",
+    version = "*",
     config = function()
       require("mini.surround").setup()
-    end
+    end,
   },
   {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    opts = {}
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    opts = {},
   },
 }

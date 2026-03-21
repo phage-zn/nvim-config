@@ -5,7 +5,7 @@ return {
         Lua = {
           workspace = { checkThirdParty = false },
           telemetry = { enable = false },
-          hint = { enable = true }
+          hint = { enable = true },
         },
       },
     },
@@ -16,14 +16,14 @@ return {
             source = {
               organizeImports = true,
               fixAll = true,
-              addMissingImports = true
-            }
+              addMissingImports = true,
+            },
           },
           inlayHints = {
             includeInlayEnumMemberValueHints = true,
             includeInlayFunctionLikeReturnTypeHints = true,
             includeInlayFunctionParameterTypeHints = true,
-            includeInlayParameterNameHints = 'all', -- 'none' | 'literals' | 'all';
+            includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all'
             includeInlayParameterNameHintsWhenArgumentMatchesName = true,
             includeInlayPropertyDeclarationTypeHints = true,
             includeInlayVariableTypeHints = true,
@@ -33,13 +33,13 @@ return {
       init_options = {
         hostInfo = "neovim",
         preferences = {
-          quotePreference = 'single',
+          quotePreference = "single",
           includeCompletionsForModuleExports = true,
           includeCompletionsForImportStatements = true,
-          importModuleSpecifierPreference = 'non-relative',
-          importModuleSpecifierEnding = 'minimal',
+          importModuleSpecifierPreference = "non-relative",
+          importModuleSpecifierEnding = "minimal",
         },
       },
-    }
-  }
+    },
+  },
 }

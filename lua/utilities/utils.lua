@@ -18,7 +18,7 @@ function utils.shorten_path(path, sep, max_len)
     end
 
     local segment = segments[idx]
-    local shortened = segment:sub(1, vim.startswith(segment, '.') and 2 or 1)
+    local shortened = segment:sub(1, vim.startswith(segment, ".") and 2 or 1)
     segments[idx] = shortened
     len = len - (#segment - #shortened)
   end
@@ -31,4 +31,5 @@ function utils.get_file_name(path, sep)
 
   return segments[#segments]
 end
+
 return utils

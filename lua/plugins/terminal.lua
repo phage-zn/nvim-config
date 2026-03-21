@@ -1,8 +1,8 @@
 return {
   {
-    'akinsho/toggleterm.nvim',
-    version = '*',
-    config = true
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    config = true,
   },
   {
     "christoomey/vim-tmux-navigator",
@@ -21,5 +21,5 @@ return {
       { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
       { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     },
-  }
+  },
 }
