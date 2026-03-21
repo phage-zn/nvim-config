@@ -7,7 +7,7 @@ return {
     lazy = false,
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter").setup(ts_config.treesitter)
+      require("nvim-treesitter").install(ts_config.treesitter.languages)
       vim.api.nvim_create_autocmd("FileType", {
         callback = function()
           pcall(vim.treesitter.start)

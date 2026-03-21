@@ -1,9 +1,13 @@
 return {
   treesitter = {
-    ensure_install = {
+    languages = {
       "java",
       "lua",
       "rust",
+      "zig",
+      "c",
+      "html",
+      "yaml",
       "javascript",
       "typescript",
       "vimdoc",
