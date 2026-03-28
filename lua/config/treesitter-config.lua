@@ -1,4 +1,5 @@
 return {
+  ignore_path = require("nvim-treesitter.config").get_install_dir("parser-ignore"),
   treesitter = {
     languages = {
       "java",
