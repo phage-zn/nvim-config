@@ -1,0 +1,31 @@
+{
+  "setting": {
+    "prefix": ["setting"],
+    "body": [
+      "<setting id=\"${1}\" label=\"${2}\" type=\"${3:action}\" help=\"${4:}\">",
+      "\t<level>${5:0}</level>",
+      "\t$0",
+      "</setting>"
+    ]
+  },
+  "button": {
+    "prefix": ["button", "action"],
+    "body": [
+      "<setting id=\"${1}\" label=\"${2}\" type=\"action\" help=\"${3:}\">",
+      "\t<level>${4:0}</level>",
+      "\t<data>$0</data>",
+      "\t<control type=\"button\" format=\"action\"/>",
+      "</setting>"
+    ]
+  },
+  "toggle": {
+    "prefix": ["toggle", "boolean"],
+    "body": [
+      "<setting id=\"${1}\" label=\"${2}\" type=\"boolean\" help=\"${3:}\">",
+      "\t<level>${4:0}</level>",
+      "\t<default>${5:false}</default>",
+      "\t<control type=\"toggle\" />",
+      "</setting>$0"
+    ]
+  }
+}

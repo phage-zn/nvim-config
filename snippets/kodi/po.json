@@ -1,0 +1,11 @@
+{
+  "string": {
+    "prefix": ["msgc", "msgid", "msgstr", "string"],
+    "body": [
+      "#: $0",
+      "msgctxt \"#${1:30000}\"",
+      "msgid \"${2:}\"",
+      "msgstr \"\""
+    ]
+  }
+}

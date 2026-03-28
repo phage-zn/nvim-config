@@ -1,0 +1,10 @@
+{
+  "name": "kodi-snippets",
+  "contributes": {
+    "snippets": [
+      { "language": "xml", "path": "./kodi/xml.json" },
+      { "language": "python", "path": "./kodi/python.json" },
+      { "language": "po", "path": "./kodi/po.json" }
+    ]
+  }
+}
