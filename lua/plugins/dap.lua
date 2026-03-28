@@ -1,9 +1,10 @@
+local dap = require("dap")
 return {
   {
     "mfussenegger/nvim-dap",
     lazy = true,
     config = function()
-      require("dap").configurations.java = {
+      dap.configurations.java = {
         {
           type = "java",
           request = "attach",
@@ -38,7 +39,7 @@ return {
       {
         "<leader>db",
         function()
-          require("dap").toggle_breakpoint()
+          dap.toggle_breakpoint()
         end,
         desc = "Toggle Breakpoint",
       },
@@ -46,7 +47,7 @@ return {
       {
         "<leader>dc",
         function()
-          require("dap").continue()
+          dap.continue()
         end,
         desc = "Continue",
       },
@@ -54,7 +55,7 @@ return {
       {
         "<leader>dC",
         function()
-          require("dap").run_to_cursor()
+          dap.run_to_cursor()
         end,
         desc = "Run to Cursor",
       },
@@ -62,7 +63,7 @@ return {
       {
         "<leader>dp",
         function()
-          require("dap").pause()
+          dap.pause()
         end,
         desc = "Pause",
       },
@@ -70,7 +71,7 @@ return {
       {
         "<leader>ds",
         function()
-          require("dap").stop()
+          dap.stop()
         end,
         desc = "Stop",
       },
@@ -78,7 +79,7 @@ return {
       {
         "<leader>dT",
         function()
-          require("dap").terminate()
+          dap.terminate()
         end,
         desc = "Terminate",
       },
@@ -86,7 +87,7 @@ return {
       {
         "<leader>da",
         function()
-          require("dap").attach()
+          dap.attach()
         end,
         desc = "Attach",
       },
