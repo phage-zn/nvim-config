@@ -60,6 +60,7 @@ function M.debug(msg)
 end
 
 function M.show_logs()
-      vim.cmd(([[tabnew %s]]):format(get_log_file()))
+  vim.cmd(([[tabnew %s]]):format(get_log_file()))
 end
+
 return M
