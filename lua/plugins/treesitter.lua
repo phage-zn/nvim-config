@@ -11,8 +11,6 @@ return {
       local treesitter = require("nvim-treesitter")
       local treesitter_config = require("nvim-treesitter.config")
       treesitter.install(ts_config.treesitter.languages)
-      local available = treesitter.get_available()
-      local installed = treesitter.get_installed()
       local function get_ignored()
         local ignore_path = treesitter_config.get_install_dir("parser-ignore")
         local ignored = {}
@@ -59,7 +57,7 @@ return {
         end
 
         for i = 1, #to_delete do
-          delete(to_delete[i])
+          delete(to_delete[i], "")
         end
       end, {
         desc = "Remove language(s) from the ignore_path to allow for install prompts",
@@ -80,6 +78,8 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(args)
+          local installed = treesitter.get_installed()
+          local available = treesitter.get_available()
           local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
 
           if not vim.list_contains(installed, lang) then
