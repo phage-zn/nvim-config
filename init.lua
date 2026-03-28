@@ -1,5 +1,6 @@
 ---@diagnostic disable: missing-fields
 require("config.neovim-config")
+local logger = require("utilities.logger")
 -- LAZY SETUP ---[[ - ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -28,3 +29,10 @@ local lsp_keymaps = require("config.lsp-keymaps")
 
 wk.add(keymaps)
 wk.add(lsp_keymaps)
+
+vim.api.nvim_create_user_command("UserShowLog", function()
+  logger.show_logs()
+end, {
+  nargs = 0,
+  desc = "Show users log",
+})
