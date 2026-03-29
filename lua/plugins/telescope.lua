@@ -17,21 +17,23 @@ return {
         "nvim-telescope/telescope-ui-select.nvim",
       },
     },
-    config = function()
-      local telescopeConfig = {
-        pickers = {
-          colorscheme = {
-            enable_preview = true,
-          },
+    opts = {
+      pickers = {
+        colorscheme = {
+          enable_preview = true,
         },
-        extensions = {
-          ["ui-select"] = {
+      },
+      extensions = {
+        ["ui-select"] = function()
+          return {
             require("telescope.themes").get_dropdown(),
-          },
-          undo = {},
-        },
-      }
-      require("telescope").setup(telescopeConfig)
+          }
+        end,
+        undo = {},
+      },
+    },
+    config = function(_, opts)
+      require("telescope").setup(opts)
       pcall(require("telescope").load_extension, "fzf")
       pcall(require("telescope").load_extension, "ui-select")
       pcall(require("telescope").load_extension, "undo")

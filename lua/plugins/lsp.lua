@@ -24,7 +24,7 @@ return {
       })
 
       require("mason").setup()
-      local mason_config = require("config.mason-config")
+      local mason_config = require("config.lsp-config")
       require("mason-lspconfig").setup({
         ensure_installed = vim.tbl_keys(mason_config.servers),
       })

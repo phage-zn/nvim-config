@@ -1,4 +1,5 @@
-local utils = require("alpha.utils")
+local alphautils = require("alpha.utils")
+local utils = require("utilities.utils")
 local target_width = 50
 local btn_padding = 10
 
@@ -7,7 +8,6 @@ if not path_ok then
   return
 end
 
-local dashboard = require("alpha.themes.dashboard")
 local if_nil = vim.F.if_nil
 
 local file_icons = {
@@ -28,7 +28,7 @@ local function icon(fn)
     return "", ""
   end
 
-  local ico, hl = utils.get_file_icon(file_icons.provider, fn)
+  local ico, hl = alphautils.get_file_icon(file_icons.provider, fn)
   if ico == "" then
     file_icons.enabled = false
     vim.notify("Alpha: Mini icons or devicons get icon failed, disable file icons", vim.log.levels.WARN)
@@ -142,7 +142,7 @@ local function get_recent_files(start, cwd, items_number, opts)
     else
       cwd_cond = vim.startswith(v, cwd)
     end
-    local ignore = (opts.ignore and opts.ignore(v, utils.get_extension(v))) or false
+    local ignore = (opts.ignore and opts.ignore(v, alphautils.get_extension(v))) or false
     if (vim.fn.filereadable(v) == 1) and cwd_cond and not ignore then
       oldfiles[#oldfiles + 1] = v
     end
@@ -170,14 +170,7 @@ end
 
 local header = {
   type = "text",
-  val = {
-    [[                                  __]],
-    [[     ___     ___    ___   __  __ /\_\    ___ ___]],
-    [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
-    [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
-    [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
-    [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
-  },
+  val = require("config.logo").val,
   opts = {
     position = "center",
     hl = "Type",
@@ -224,7 +217,7 @@ local buttons = {
 
 local footer = {
   type = "text",
-  val = "",
+  val = vim.split(utils.get_fortune(), "\n"),
   opts = {
     position = "center",
     hl = "Number",
@@ -264,13 +257,4 @@ local config = {
   },
 }
 
-return {
-  section = section,
-  config = config,
-  -- theme specific config
-  mru_opts = get_recent_files_opts,
-  leader = leader,
-  file_icons = file_icons,
-  -- deprecated
-  nvim_web_devicons = file_icons,
-}
+return config
