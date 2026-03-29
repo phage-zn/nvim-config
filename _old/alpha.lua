@@ -1,4 +1,5 @@
-local utils = require("alpha.utils")
+local alpha_utils = require("alpha.utils")
+local utils = require("utilities.utils")
 local target_width = 50
 local btn_padding = 10
 
@@ -7,15 +8,12 @@ if not path_ok then
   return
 end
 
-local dashboard = require("alpha.themes.dashboard")
 local if_nil = vim.F.if_nil
 
 local file_icons = {
   enabled = true,
   highlight = true,
-  -- available: devicons, mini, to use nvim-web-devicons or mini.icons
-  -- if provider not loaded and enabled is true, it will try to use another provider
-  provider = "mini",
+  provider = "devicons",
 }
 
 local function icon(fn)
@@ -28,7 +26,7 @@ local function icon(fn)
     return "", ""
   end
 
-  local ico, hl = utils.get_file_icon(file_icons.provider, fn)
+  local ico, hl = alpha_utils.get_file_icon(file_icons.provider, fn)
   if ico == "" then
     file_icons.enabled = false
     vim.notify("Alpha: Mini icons or devicons get icon failed, disable file icons", vim.log.levels.WARN)
@@ -142,7 +140,7 @@ local function get_recent_files(start, cwd, items_number, opts)
     else
       cwd_cond = vim.startswith(v, cwd)
     end
-    local ignore = (opts.ignore and opts.ignore(v, utils.get_extension(v))) or false
+    local ignore = (opts.ignore and opts.ignore(v, alpha_utils.get_extension(v))) or false
     if (vim.fn.filereadable(v) == 1) and cwd_cond and not ignore then
       oldfiles[#oldfiles + 1] = v
     end
@@ -167,110 +165,95 @@ local function get_recent_files(start, cwd, items_number, opts)
     opts = {},
   }
 end
-
-local header = {
-  type = "text",
-  val = {
-    [[                                  __]],
-    [[     ___     ___    ___   __  __ /\_\    ___ ___]],
-    [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
-    [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
-    [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
-    [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
+return {
+  "goolord/alpha-nvim",
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
+    "nvim-lua/plenary.nvim",
   },
   opts = {
-    position = "center",
-    hl = "Type",
-  },
-}
-
-local section_mru = {
-  type = "group",
-  val = {
-    {
-      type = "text",
-      val = "Recent files",
-      opts = {
-        hl = "SpecialComment",
-        shrink_margin = false,
+    layout = {
+      { type = "padding", val = 2 },
+      {
+        type = "text",
+        val = vim.split(
+          [[
+ ██████   █████ ██████████    ███████    █████   █████ █████ ██████   ██████
+░░██████ ░░███ ░░███░░░░░█  ███░░░░░███ ░░███   ░░███ ░░███ ░░██████ ██████
+ ░███░███ ░███  ░███  █ ░  ███     ░░███ ░███    ░███  ░███  ░███░█████░███
+ ░███░░███░███  ░██████   ░███      ░███ ░███    ░███  ░███  ░███░░███ ░███
+ ░███ ░░██████  ░███░░█   ░███      ░███ ░░███   ███   ░███  ░███ ░░░  ░███
+ ░███  ░░█████  ░███ ░   █░░███     ███   ░░░█████░    ░███  ░███      ░███
+ █████  ░░█████ ██████████ ░░░███████░      ░░███      █████ █████     █████
+░░░░░    ░░░░░ ░░░░░░░░░░    ░░░░░░░         ░░░      ░░░░░ ░░░░░     ░░░░░
+      ]],
+          "\n"
+        ),
+        opts = {
+          position = "center",
+          hl = "Type",
+        },
+      },
+      { type = "padding", val = 2 },
+      {
+        type = "group",
+        val = {
+          {
+            type = "text",
+            val = "Recent files",
+            opts = {
+              hl = "SpecialComment",
+              shrink_margin = false,
+              position = "center",
+            },
+          },
+          { type = "padding", val = 1 },
+          {
+            type = "group",
+            val = function()
+              return { get_recent_files(0, vim.fn.getcwd()) }
+            end,
+            opts = { shrink_margin = false },
+          },
+        },
+      },
+      { type = "padding", val = 2 },
+      {
+        type = "group",
+        val = {
+          { type = "text",    val = "Quick links", opts = { hl = "SpecialComment", position = "center" } },
+          { type = "padding", val = 1 },
+          button("e", "  New file", "<cmd>ene<CR>"),
+          button("SPC f f", "󰈞  Find file"),
+          button("SPC f s", "󰊄  Find string"),
+          button("c", "  Configuration", "<cmd>exe 'cd' stdpath('config')<CR>"),
+          button("u", "  Update plugins", "<cmd>Lazy sync<CR>"),
+          button("q", "󰅚  Quit", "<cmd>qa<CR>"),
+        },
         position = "center",
       },
+      { type = "padding", val = 2 },
+      {
+        type = "text",
+        val = vim.split(utils.get_fortune(), "\n"),
+        opts = {
+          position = "center",
+          hl = "Number",
+        },
+      },
     },
-    { type = "padding", val = 1 },
-    {
-      type = "group",
-      val = function()
-        return { get_recent_files(0, vim.fn.getcwd()) }
+    opts = {
+      margin = 5,
+      setup = function()
+        vim.api.nvim_create_autocmd("DirChanged", {
+          pattern = "*",
+          group = "alpha_temp",
+          callback = function()
+            require("alpha").redraw()
+            vim.cmd("AlphaRemap")
+          end,
+        })
       end,
-      opts = { shrink_margin = false },
     },
   },
-}
-
-local buttons = {
-  type = "group",
-  val = {
-    { type = "text",    val = "Quick links", opts = { hl = "SpecialComment", position = "center" } },
-    { type = "padding", val = 1 },
-    button("e", "  New file", "<cmd>ene<CR>"),
-    button("SPC f f", "󰈞  Find file"),
-    button("SPC f s", "󰊄  Find string"),
-    button("c", "  Configuration", "<cmd>exe 'cd' stdpath('config')<CR>"),
-    button("u", "  Update plugins", "<cmd>Lazy sync<CR>"),
-    button("q", "󰅚  Quit", "<cmd>qa<CR>"),
-  },
-  position = "center",
-}
-
-local footer = {
-  type = "text",
-  val = "",
-  opts = {
-    position = "center",
-    hl = "Number",
-  },
-}
-
-local section = {
-  header = header,
-  buttons = buttons,
-  footer = footer,
-  mru = get_recent_files,
-}
-
-local config = {
-  layout = {
-    { type = "padding", val = 2 },
-    section.header,
-    { type = "padding", val = 2 },
-    section_mru,
-    { type = "padding", val = 2 },
-    section.buttons,
-    { type = "padding", val = 2 },
-    section.footer,
-  },
-  opts = {
-    margin = 5,
-    setup = function()
-      vim.api.nvim_create_autocmd("DirChanged", {
-        pattern = "*",
-        group = "alpha_temp",
-        callback = function()
-          require("alpha").redraw()
-          vim.cmd("AlphaRemap")
-        end,
-      })
-    end,
-  },
-}
-
-return {
-  section = section,
-  config = config,
-  -- theme specific config
-  mru_opts = get_recent_files_opts,
-  leader = leader,
-  file_icons = file_icons,
-  -- deprecated
-  nvim_web_devicons = file_icons,
 }

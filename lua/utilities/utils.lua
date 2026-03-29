@@ -32,4 +32,39 @@ function utils.get_file_name(path, sep)
   return segments[#segments]
 end
 
+function utils.command_exists(cmd)
+  local handle = io.popen("which " .. cmd .. " 2>/dev/null")
+  if handle then
+    local result = handle:read("*a")
+    handle:close()
+    return result ~= ""
+  end
+  return false
+end
+
+function utils.get_fortune()
+  local result = "Nothing going on here..."
+  if utils.command_exists("fortune") then
+    local handle = io.popen("fortune -s")
+    if handle then
+      result = handle:read("*a")
+      handle:close()
+    end
+  end
+  if utils.command_exists("cowthink") then
+    local handle = io.popen('cowthink -f $(find /usr/share/cowsay -type f | shuf -n 1) "' .. result .. '"')
+    if handle then
+      result = handle:read("*a")
+      handle:close()
+    end
+  end
+  return result
+end
+
+function utils.toggle_lazygit()
+  local terminal = require("toggleterm.terminal").Terminal
+  local lazygit = terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
+  lazygit:toggle()
+end
+
 return utils

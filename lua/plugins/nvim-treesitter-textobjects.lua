@@ -1,21 +1,8 @@
 return {
-  ignore_path = require("nvim-treesitter.config").get_install_dir("parser-ignore"),
-  treesitter = {
-    languages = {
-      "lua",
-      "c",
-      "java",
-      "typescript",
-      "javascript",
-      "rust",
-      "zig",
-      "vimdoc",
-      "vim",
-      "regex",
-    },
-  },
-
-  textobjects = {
+  "nvim-treesitter/nvim-treesitter-textobjects",
+  branch = "main",
+  dependencies = { "nvim-treesitter/nvim-treesitter" },
+  opts = {
     select = {
       enable = true,
       lookahead = true,
