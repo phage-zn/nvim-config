@@ -78,11 +78,13 @@ function M.autoinstall(args)
       return
     end
 
-    local response = vim.fn.input("Parser available for '" .. lang .. "', install? (Y/n/[i]gnore)")
-    if response == "" or response:lower() == "y" then
+    local response =
+        vim.fn.confirm("Parser available for '" .. lang .. "', install?", "&Yes\n&No\n&Ignore", 1, "Question")
+
+    if response == 1 then
       pcall(treesitter.install, lang)
     else
-      if response:lower() == "i" then
+      if response == 3 then
         M.ignore_lang(lang)
       end
     end

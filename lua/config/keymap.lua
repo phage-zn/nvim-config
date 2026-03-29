@@ -28,8 +28,8 @@ return {
       local has_other = #buffers > 1
 
       if buf_info.changed == 1 then
-        local response = vim.fn.input("Close modified buffer '" .. buf_info.name .. "'? (Y/n): ")
-        if not (response == "" or response:lower() == "y") then
+        local response = vim.fn.confirm("Close modified buffer '" .. buf_info.name .. "'?", "&Yes\n&No", 1, "Warning")
+        if not (response == 1) then
           vim.notify("Skipped: " .. buf_info.name)
           return
         end
@@ -54,8 +54,8 @@ return {
       for _, buf in ipairs(buffers) do
         if buf.hidden == 1 then
           if buf.changed == 1 then
-            local response = vim.fn.input("Close modified buffer '" .. buf.name .. "'? (Y/n): ")
-            if response == "" or response:lower() == "y" then
+            local response = vim.fn.confirm("Close modified buffer '" .. buf.name .. "'?", "&Yes\n&No", 1, "Warning")
+            if response == 1 then
               vim.api.nvim_buf_delete(buf.bufnr, { force = true })
               count = count + 1
             else
