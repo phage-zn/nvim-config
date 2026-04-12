@@ -30,10 +30,7 @@ return {
       })
 
       for server_name, server_config in pairs(mason_config.servers) do
-        vim.lsp.config(server_name, {
-          settings = server_config.settings,
-          init_options = server_config.init_options or {},
-        })
+        vim.lsp.config(server_name, server_config)
       end
     end,
   },
