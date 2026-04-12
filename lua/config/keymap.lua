@@ -180,8 +180,11 @@ return {
   { "<Esc>", "<cmd>nohlsearch<cr>", desc = "Clear Highlights" },
   { "<C-s>", "<cmd>w<cr>", desc = "Write Buffer" },
   { "<C-q><C-w>", "<cmd>confirm q<cr>", desc = "Confirm Quit Window" },
+  { "<C-q>w", "<cmd>confirm q<cr>", desc = "Confirm Quit Window" },
   { "<C-q><C-q>", "<cmd>confirm qall<cr>", desc = "Confirm Quit All" },
+  { "<C-q>q", "<cmd>confirm qall<cr>", desc = "Confirm Quit All" },
   { "<C-q><C-f>", "<cmd>qa!<cr>", desc = "Force Quit" },
+  { "<C-q>f", "<cmd>qa!<cr>", desc = "Force Quit" },
 
   { "|", "<cmd>vsplit<cr>", desc = "Vertical Split" },
   { "\\", "<cmd>split<cr>", desc = "Horizontal Split" },
