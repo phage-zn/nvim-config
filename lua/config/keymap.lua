@@ -201,10 +201,12 @@ return {
   },
   {
     "<leader>lh",
-    "<cmd>lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<cr>",
+    function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    end,
     desc = "Toggle Inlay Hints",
   },
-  { "<leader>li", "<cmd>LspInfo<cr>", desc = "LSP Info", icon = "" },
+  { "<leader>li", "<cmd>checkhealth vim.lsp<cr>", desc = "LSP Info", icon = "" },
   { "<leader>l?", vim.lsp.buf.signature_help, desc = "Signature Help", icon = "󰋖" },
   { "<leader>ld", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics", icon = "" },
   { "<leader>lt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "Type Definition", icon = "" },
@@ -215,6 +217,15 @@ return {
     icon = "",
   },
   { "<leader>lX", "<cmd>Trouble diagnostics toggle<cr>", desc = "Toggle diagnostics", icon = "" },
+  {
+    "<leader>ll",
+    function()
+      vim.cmd("tabnew " .. vim.lsp.log.get_filename())
+    end,
+    desc = "Open Lsp Log"
+  },
+  { "<leader>lr", "<cmd>lsp restart<cr>", desc = "Lsp Restart" },
+  { "<leader>ls", "<cmd>lsp stop<cr>", desc = "Lsp Stop" },
 
   { "g", group = "Go To" },
   { "gd", vim.lsp.buf.definition, desc = "Go to Definition" },
