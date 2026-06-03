@@ -18,6 +18,7 @@ return {
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
   { "<leader>u", "<cmd>Telescope undo<cr>", desc = "Undo Tree", mode = "n" },
 
+  { "<A-f>", "<cmd>Telescope find_files<cr>", desc = "Find File", mode = "n" },
   {
     "<A-x>",
     function()
