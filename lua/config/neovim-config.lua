@@ -41,6 +41,7 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 -- Highlight on search
 vim.o.hlsearch = true
 
+vim.o.exrc = true
 local diagnostic_config = {
   float = { source = "always" },
 }
