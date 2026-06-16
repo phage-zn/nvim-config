@@ -30,6 +30,13 @@ return {
           },
         },
       },
+      filetypes = {
+        'javascript',
+        'javascriptreact',
+        'typescript',
+        'typescriptreact',
+        'vue',
+      },
       init_options = {
         hostInfo = "neovim",
         preferences = {
@@ -39,7 +46,37 @@ return {
           importModuleSpecifierPreference = "non-relative",
           importModuleSpecifierEnding = "minimal",
         },
+        -- tsserver = {
+        --   logVerbosity = 'verbose',
+        --   trace = 'verbose',
+        -- },
+        plugins = {
+          {
+            name = "@vue/typescript-plugin",
+            location = '/home/lms/.local/share/nvim/mason/packages/vue-language-server',
+            languages = { "javascript", "typescript", "vue" },
+          },
+        },
       },
+    },
+    vue_ls = {},
+    eslint = {
+      settings = {
+        codeActionOnSave = {
+          enable = true,
+          mode = "all"
+        },
+        run = 'onSave',
+        workingDirectory = { mode = "location" }
+      },
+    },
+    yamlls = {
+      settings = {
+        schemas = {
+          ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+          ["https://json.schemastore.org/github-action.json"] = "action.yml",
+        }
+      }
     },
   },
 }

@@ -47,3 +47,6 @@ local diagnostic_config = {
 }
 
 vim.diagnostic.config(diagnostic_config)
+vim.opt.backup = false
+vim.opt.writebackup = false
+vim.o.exrc = true

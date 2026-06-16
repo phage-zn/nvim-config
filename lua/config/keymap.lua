@@ -13,6 +13,9 @@ return {
   { "<leader>fc", "<cmd>Telescope colorscheme<cr>", desc = "Color Scheme", mode = "n" },
   { "<leader>fm", "<cmd>Telescope marks<cr>", desc = "Mark List", mode = "n" },
   { "<leader>fj", "<cmd>Telescope jumplist<cr>", desc = "Jump List", mode = "n" },
+  { "<leader>fJc", function() require("utilities.jar-picker").pick_class() end,   desc = "Browse Dep Classes", mode = "n" },
+  
+  { "<leader>fJg", function() require("utilities.jar-picker").grep_deps() end,    desc = "Grep Dep Sources",   mode = "n" },
   { "<leader>f*", "<cmd>Telescope builtin<cr>", desc = "All Commands", mode = "n" },
 
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
