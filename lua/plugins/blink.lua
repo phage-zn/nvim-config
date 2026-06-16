@@ -20,6 +20,16 @@ return {
 
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
+      providers = {
+        snippets = {
+          opts = {
+            search_paths = {
+              vim.fn.stdpath("config") .. "/snippets",
+              vim.fn.getcwd() .. "/.vscode/extensions/ksg-snippets",
+            },
+          },
+        },
+      },
     },
 
     fuzzy = { implementation = "prefer_rust_with_warning" },
