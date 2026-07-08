@@ -43,7 +43,13 @@ vim.o.hlsearch = true
 
 vim.o.exrc = true
 local diagnostic_config = {
-  float = { source = "always" },
+  float = {
+    source = "always",
+    style = "minimal",
+    border = "rounded",
+    header = "",
+    prefix = "",
+  },
 }
 
 vim.diagnostic.config(diagnostic_config)
