@@ -5,7 +5,7 @@ local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.fn.stdpath "data" .. "/site/java/workspace-root/" .. project_name
 vim.fn.mkdir(workspace_dir, "p")
 local jdtls = require('jdtls')
-local jvm = "$HOME/.sdkman/candidates/java/"
+local jvm = vim.fn.expand "$HOME/.sdkman/candidates/java/"
 
 -- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
 -- TODO: Move to config
@@ -13,7 +13,7 @@ local config = {
   -- The command that starts the language server
   -- See: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
   cmd = {
-    vim.fn.expand(jvm .. "21.0.2-open/bin/java"),
+    jvm .. "21.0.2-open/bin/java",
     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
     "-Dosgi.bundles.defaultStartLevel=4",
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -71,21 +71,21 @@ local config = {
         updateBuildConfiguration = 'interactive',
         runtimes = {
           {
-            name = "Java 17",
-            path = jvm .. "17.0.18-tem/",
+            name = "JavaSE-17",
+            path = jvm .. "17.0.18-tem",
             default = true
           },
           {
-            name = "Java 8",
-            path = jvm .. "8.0.482-tem/",
+            name = "JavaSE-1.8",
+            path = jvm .. "8.0.482-tem",
           },
           {
-            name = "Java 21",
-            path = jvm .. "21.0.2-open/",
+            name = "JavaSE-21",
+            path = jvm .. "21.0.2-open",
           },
           {
-            name = "Java 25",
-            path = jvm .. "25.0.2-open/",
+            name = "JavaSE-25",
+            path = jvm .. "25.0.2-open",
           },
         },
       },
