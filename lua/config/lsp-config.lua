@@ -78,5 +78,10 @@ return {
         }
       }
     },
+    copilot = {
+      cmd = { "copilot-language-server", "--stdio" },
+      filetypes = { "*" },
+      root_markers = { ".git" },
+    }
   },
 }
