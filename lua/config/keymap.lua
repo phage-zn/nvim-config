@@ -3,6 +3,8 @@ local b_utils = require("utilities.buffers")
 local gs = require("gitsigns")
 
 return {
+  { "j", "gj", mode = "n" },
+  { "k", "gk", mode = "n" },
   { "-", "<cmd>Oil<cr>", desc = "Open Parent Dir" },
   { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = "" },
 
@@ -170,10 +172,14 @@ return {
     end,
     desc = "Add current line to quickfix",
   },
-  { "gq",    "<cmd>cnext<cr>",      desc = "Next Quickfix Item" },
-  { "gQ",    "<cmd>cprev<cr>",      desc = "Prev Quickfix Item" },
+  { "gq", "<cmd>cnext<cr>", desc = "Next Quickfix Item" },
+  { "gQ", "<cmd>cprev<cr>", desc = "Prev Quickfix Item" },
 
-  { "<Esc>", "<cmd>nohlsearch<cr>", desc = "Clear Highlights" },
+  {
+    "<Esc>",
+    "<Cmd>nohlsearch<Bar>diffupdate<Bar>call nvim_buf_clear_namespace(0, nvim_create_namespace('nvim.multicursor'), 0, -1) <CR>",
+    desc = "Clear Highlights"
+  },
   {
     "<C-s>",
     function()
