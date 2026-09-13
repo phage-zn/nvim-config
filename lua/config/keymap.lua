@@ -1,4 +1,5 @@
 local utils = require("utilities.utils")
+local b_utils = require("utilities.buffers")
 local gs = require("gitsigns")
 
 return {
@@ -23,24 +24,20 @@ return {
     "<A-x>",
     function()
       local buf = vim.api.nvim_get_current_buf()
-      local buf_info = vim.fn.getbufinfo(buf)[1]
       local buffers = vim.fn.getbufinfo({ buflisted = 1 })
+      buffers = vim.tbl_filter(function(b)
+        return b.bufnr ~= buf
+      end, buffers)
+      table.sort(buffers, function(a, b)
+        return a.lastused > b.lastused
+      end)
 
       local has_other = #buffers > 1
 
-      if buf_info.changed == 1 then
-        local response = vim.fn.confirm("Close modified buffer '" .. buf_info.name .. "'?", "&Yes\n&No", 1, "Warning")
-        if not (response == 1) then
-          vim.notify("Skipped: " .. buf_info.name)
-          return
-        end
+      if has_other and buffers[1] then
+        vim.cmd("b" .. buffers[1].bufnr)
       end
-
-      if has_other then
-        vim.cmd("bp")
-      end
-
-      vim.api.nvim_buf_delete(buf, { force = true })
+      b_utils.delete(buf, false)
     end,
     desc = "Delete Current Buffer",
   },
@@ -52,21 +49,20 @@ return {
       local skip_count = 0
       local notification = "Closed %d buffer(s)."
       local skip_notification = " Skipped %d modified buffer(s)."
+      buffers = vim.tbl_filter(function(buf)
+        return buf.hidden == 1
+      end, buffers)
       for _, buf in ipairs(buffers) do
-        if buf.hidden == 1 then
-          if buf.changed == 1 then
-            local response = vim.fn.confirm("Close modified buffer '" .. buf.name .. "'?", "&Yes\n&No", 1, "Warning")
-            if response == 1 then
-              vim.api.nvim_buf_delete(buf.bufnr, { force = true })
-              count = count + 1
-            else
-              vim.notify("Skipped: " .. buf.name)
-              skip_count = skip_count + 1
-            end
-          else
-            vim.api.nvim_buf_delete(buf.bufnr, { force = false })
-            count = count + 1
-          end
+        local Result = b_utils.Result
+        local res = b_utils.delete(buf)
+        if res == Result.FAIL then
+          pcall(vim.notify, "Cancelled.")
+        end
+        if res == Result.SUCCESS then
+          count = count + 1
+        end
+        if res == Result.CANCEL then
+          skip_count = skip_count + 1
         end
       end
       local message = string.format(notification, count)
@@ -75,7 +71,7 @@ return {
       end
       vim.notify(message)
     end,
-    desc = "Delete Other Buffers",
+    desc = "Delete Hidden Buffers",
   },
   { "<A-h>", "<cmd>bp<cr>",                desc = "Go to Previous Buffer" },
   { "<A-l>", "<cmd>bn<cr>",                desc = "Go to Next Buffer" },
@@ -85,7 +81,6 @@ return {
     function()
       vim.cmd("enew")
       vim.bo.buftype = "nofile"
-      vim.bo.bufhidden = "wipe"
       vim.bo.buflisted = true
     end,
     desc = "New Scratch Buffer",
@@ -175,11 +170,18 @@ return {
     end,
     desc = "Add current line to quickfix",
   },
-  { "gq", "<cmd>cnext<cr>", desc = "Next Quickfix Item" },
-  { "gQ", "<cmd>cprev<cr>", desc = "Prev Quickfix Item" },
+  { "gq",    "<cmd>cnext<cr>",      desc = "Next Quickfix Item" },
+  { "gQ",    "<cmd>cprev<cr>",      desc = "Prev Quickfix Item" },
 
   { "<Esc>", "<cmd>nohlsearch<cr>", desc = "Clear Highlights" },
-  { "<C-s>", "<cmd>w<cr>", desc = "Write Buffer" },
+  {
+    "<C-s>",
+    function()
+      local buf = vim.api.nvim_get_current_buf()
+      b_utils.write(buf)
+    end,
+    desc = "Write Buffer"
+  },
   { "<C-q><C-w>", "<cmd>confirm q<cr>", desc = "Confirm Quit Window" },
   { "<C-q>w", "<cmd>confirm q<cr>", desc = "Confirm Quit Window" },
   { "<C-q><C-q>", "<cmd>confirm qall<cr>", desc = "Confirm Quit All" },
