@@ -1,6 +1,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.o.termguicolors = true
+vim.o.autoread = true
 vim.o.undofile = true
 vim.o.showmode = false
 vim.o.scrolloff = 20
@@ -8,6 +9,7 @@ vim.o.breakindent = true
 vim.o.signcolumn = "yes"
 vim.o.cursorline = true
 vim.o.fillchars = "vert:║,horiz:═,vertright:╠,vertleft:╣,horizup:╩,horizdown:╦,verthoriz:╬,eob: "
+vim.o.lbr = true
 
 vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.wo[0][0].foldmethod = "expr"
@@ -42,8 +44,7 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.o.hlsearch = true
 
 vim.o.exrc = true
-local diagnostic_config = {
-  float = { source = "always" },
-}
 
-vim.diagnostic.config(diagnostic_config)
+vim.diagnostic.config({
+  float = { source = true },
+})
