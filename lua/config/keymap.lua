@@ -10,15 +10,16 @@ return {
 
   { "<leader>f", group = "Find" },
   { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find File", mode = "n" },
+  { "<leader>ft", function() require("utilities.pickers.tab-picker").tabs() end, desc = "Find Tabs", mode = "n" },
   { "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Find Word", mode = "n" },
   { "<leader>fs", "<cmd>Telescope live_grep<cr>", desc = "Find String", mode = "n" },
   { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files", mode = "n" },
   { "<leader>fc", "<cmd>Telescope colorscheme<cr>", desc = "Color Scheme", mode = "n" },
   { "<leader>fm", "<cmd>Telescope marks<cr>", desc = "Mark List", mode = "n" },
   { "<leader>fj", "<cmd>Telescope jumplist<cr>", desc = "Jump List", mode = "n" },
-  { "<leader>fJc", function() require("utilities.jar-picker").pick_class() end,   desc = "Browse Dep Classes", mode = "n" },
-  
-  { "<leader>fJg", function() require("utilities.jar-picker").grep_deps() end,    desc = "Grep Dep Sources",   mode = "n" },
+  { "<leader>fJc", function() require("utilities.jar-picker").pick_class() end, desc = "Browse Dep Classes", mode = "n" },
+
+  { "<leader>fJg", function() require("utilities.jar-picker").grep_deps() end, desc = "Grep Dep Sources", mode = "n" },
   { "<leader>f*", "<cmd>Telescope builtin<cr>", desc = "All Commands", mode = "n" },
 
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
@@ -69,6 +70,8 @@ return {
         if res == Result.CANCEL then
           skip_count = skip_count + 1
         end
+        count = count + 1
+        vim.api.nvim_buf_delete(buf.bufnr, { force = false })
       end
       local message = string.format(notification, count)
       if skip_count > 0 then
@@ -177,6 +180,8 @@ return {
   },
   { "gq", "<cmd>cnext<cr>", desc = "Next Quickfix Item" },
   { "gQ", "<cmd>cprev<cr>", desc = "Prev Quickfix Item" },
+  { "gl", "<cmd>lnext<cr>", desc = "Next Loc Item" },
+  { "gL", "<cmd>lprev<cr>", desc = "Prev Loc Item" },
 
   {
     "<Esc>",
@@ -237,7 +242,7 @@ return {
     desc = "Open Lsp Log"
   },
   { "<leader>lr", "<cmd>lsp restart<cr>", desc = "Lsp Restart" },
-  { "<leader>ls", "<cmd>lsp stop<cr>", desc = "Lsp Stop" },
+  { "<leader>lq", "<cmd>lsp stop<cr>", desc = "Lsp Stop" },
 
   { "g", group = "Go To" },
   { "gd", vim.lsp.buf.definition, desc = "Go to Definition" },
@@ -246,15 +251,16 @@ return {
     function()
       vim.diagnostic.jump({ count = 1, float = true })
     end,
-    desc = "Go to Next Diagnostic",
+    desc = "Next Diagnostic",
   },
   {
     "gk",
     function()
       vim.diagnostic.jump({ count = -1, float = true })
     end,
-    desc = "Go to Prev Diagnostic",
+    desc = "Prev Diagnostic",
   },
+  { "gO", "<cmd>Trouble symbols toggle<cr>", desc = "Lsp Symbols" },
   {
     "<leader>d",
     group = "DAP",

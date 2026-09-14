@@ -1,3 +1,22 @@
+local copilot_on = false
+
+local function copilot_toggle()
+  copilot_on = not copilot_on
+  if copilot_on then
+      require("lazy").load({ plugins = { "copilot.lua", "copilot-cmp" } })
+    vim.cmd("Copilot enable")
+    vim.lsp.enable("copilot")
+    vim.notify("Copilot: ON", vim.log.levels.INFO)
+  else
+    vim.cmd("Copilot disable")
+    vim.lsp.enable("copilot", false)
+    vim.notify("Copilot: OFF", vim.log.levels.INFO)
+  end
+end
+
+vim.api.nvim_create_user_command("CopilotToggle", copilot_toggle, {})
+vim.keymap.set("n", "<leader>aa", copilot_toggle, { desc = "Toggle Copilot" })
+
 return {
   {
     "folke/sidekick.nvim",
@@ -30,11 +49,6 @@ return {
         function() require("sidekick.cli").focus() end,
         desc = "Sidekick Focus",
         mode = { "n", "t", "i", "x" },
-      },
-      {
-        "<leader>aa",
-        function() require("sidekick.cli").toggle() end,
-        desc = "Sidekick Toggle CLI",
       },
       {
         "<leader>as",

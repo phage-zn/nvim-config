@@ -1,17 +1,12 @@
 local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle", ".project" }
 local root_dir = require("jdtls.setup").find_root(root_markers)
--- calculate workspace dir
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.fn.stdpath "data" .. "/site/java/workspace-root/" .. project_name
 vim.fn.mkdir(workspace_dir, "p")
 local jdtls = require('jdtls')
-local jvm = vim.fn.expand "$HOME/.sdkman/candidates/java/"
+local jvm = vim.fn.expand "$SDKMAN_DIR/candidates/java/"
 
--- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
--- TODO: Move to config
 local config = {
-  -- The command that starts the language server
-  -- See: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
   cmd = {
     jvm .. "21.0.2-open/bin/java",
     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
@@ -33,13 +28,7 @@ local config = {
     "-data",
     workspace_dir,
   },
-  -- This is the default if not provided, you can remove it. Or adjust as needed.
-  -- One dedicated LSP server & client will be started per unique root_dir
   root_dir = root_dir,
-
-  -- Here you can configure eclipse.jdt.ls specific settings
-  -- See https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
-  -- for a list of options
   settings = {
     java = {
       inlayHints = { parameterNames = { enabled = 'all' } },
@@ -172,25 +161,12 @@ local config = {
       },
     },
   },
-
-  -- Language server `initializationOptions`
-  -- You need to extend the `bundles` with paths to jar files
-  -- if you want to use additional eclipse.jdt.ls plugins.
-  --
-  -- See https://github.com/mfussenegger/nvim-jdtls#java-debug-installation
-  --
-  -- If you don't plan on using the debugger or other eclipse.jdt.ls plugins you can remove this
   init_options = {
     bundles = {
       vim.fn.expand "$MASON/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar",
     },
   },
 }
-
-config.on_attach = function(client, bufnr)
-  -- Trigger JAR class index in background (non-blocking)
-  require("utilities.jar-picker").ensure_index(root_dir, workspace_dir, { "co/octopus", "com/ksg", "com/rogue" }, false)
-end
 
 config.on_init = function(client, _)
   client.notify('workspace/didChangeConfiguration', { settings = config.settings })

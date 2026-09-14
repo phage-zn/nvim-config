@@ -15,7 +15,7 @@ return {
         ["<C-t>"] = { "actions.select", opts = { tab = true } },
         ["<C-p>"] = "actions.preview",
         ["<C-c>"] = { "actions.close", mode = "n" },
-        ["<C-l>"] = "actions.refresh",
+        ["<C-y>"] = "actions.refresh",
         ["-"] = { "actions.parent", mode = "n" },
         ["_"] = { "actions.open_cwd", mode = "n" },
         ["`"] = { "actions.cd", mode = "n" },
@@ -26,6 +26,7 @@ return {
         ["g\\"] = { "actions.toggle_trash", mode = "n" },
       },
       use_default_keymaps = false,
+      delete_to_trash = true,
       view_options = {
         show_hidden = true,
       },
