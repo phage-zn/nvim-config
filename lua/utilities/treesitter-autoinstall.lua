@@ -34,16 +34,16 @@ function M.ignore_lang(lang)
 end
 
 function M.clear_ignored(args)
-  local ts_config = require("config.treesitter-config")
-  if not vim.uv.fs_stat(ts_config.ignore_path) then
-    logger.info(ts_config.ignore_path .. " does not exist")
+  local ignore_path = treesitter_config.get_install_dir("parser-ignore")
+  if not vim.uv.fs_stat(ignore_path) then
+    logger.info(ignore_path .. " does not exist")
     return
   end
   local to_delete = {}
 
   for _, lang in ipairs(args.fargs) do
     if vim.tbl_contains(M.get_ignored(), lang) then
-      to_delete[#to_delete + 1] = vim.fs.joinpath(ts_config.ignore_path, lang .. ".ignore")
+      to_delete[#to_delete + 1] = vim.fs.joinpath(ignore_path, lang .. ".ignore")
     end
   end
 
@@ -55,7 +55,7 @@ function M.clear_ignored(args)
   end
 
   if #to_delete == 0 then
-    delete(ts_config.ignore_path, "rf")
+    delete(ignore_path, "rf")
   end
 
   for i = 1, #to_delete do
@@ -69,25 +69,29 @@ function M.autoinstall(args)
   local available = treesitter.get_available()
   local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
 
-  if not vim.list_contains(installed, lang) then
-    if vim.tbl_contains(M.get_ignored(), lang) then
-      return
-    end
+  if vim.list_contains(installed, lang) then
+    return
+  end
 
-    if not vim.list_contains(available, lang) then
-      return
-    end
+  if vim.tbl_contains(M.get_ignored(), lang) then
+    return
+  end
 
-    local response =
-        vim.fn.confirm("Parser available for '" .. lang .. "', install?", "&Yes\n&No\n&Ignore", 1, "Question")
+  if not vim.list_contains(available, lang) then
+    return
+  end
 
-    if response == 1 then
-      pcall(treesitter.install, lang)
-    else
-      if response == 3 then
-        M.ignore_lang(lang)
-      end
-    end
+  local ok, response = pcall(vim.fn.confirm, "Parser available for '" .. lang .. "', install?", "&Yes\n&No\n&Ignore", 1,
+    "Question")
+
+  if not ok or response == 2 then
+    return
+  end
+
+  if response == 1 then
+    pcall(treesitter.install, lang)
+  elseif response == 3 then
+    M.ignore_lang(lang)
   end
 end
 

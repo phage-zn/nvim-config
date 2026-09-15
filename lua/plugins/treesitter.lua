@@ -1,15 +1,27 @@
-local ts_config = require("config.treesitter-config")
-local logger = require("utilities.logger")
 return {
   {
     "nvim-treesitter/nvim-treesitter",
     branch = "main",
     lazy = false,
     build = ":TSUpdate",
-    config = function()
-      local treesitter = require("nvim-treesitter")
+    opts = {
+      languages = {
+        "lua",
+        "c",
+        "java",
+        "typescript",
+        "javascript",
+        "rust",
+        "zig",
+        "vimdoc",
+        "vim",
+        "regex",
+      },
+    },
+    config = function(_, opts)
+      local ts_install = require("nvim-treesitter.install")
       local autoinstall = require("utilities.treesitter-autoinstall")
-      treesitter.install(ts_config.treesitter.languages)
+      ts_install.install(opts.languages)
 
       vim.api.nvim_create_user_command("TSUserClearIgnore", autoinstall.clear_ignored, {
         desc = "Remove language(s) from the ignore_path to allow for install prompts",
@@ -17,7 +29,6 @@ return {
         nargs = "*",
         complete = autoinstall.complete_ignored,
       })
-
 
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(args)
@@ -30,10 +41,43 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "main",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    config = function()
-      require("nvim-treesitter-textobjects").setup(ts_config.textobjects)
+    init = function ()
+      vim.g.no_plugin_maps = true
     end,
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    opts = {
+      select = {
+        lookahead = true,
+        lookbehind = true,
+        keymaps = {
+          ["af"] = "@function.outer",
+          ["if"] = "@function.inner",
+          ["ac"] = "@class.outer",
+          ["ic"] = "@class.inner",
+          ["aa"] = "@parameter.outer",
+          ["ia"] = "@parameter.inner",
+        },
+      },
+      move = {
+        set_jumps = true,
+        goto_next_start = {
+          ["gm"] = "@function.outer",
+          ["go"] = "@class.outer",
+        },
+        goto_next_end = {
+          ["gw"] = "@function.outer",
+          ["]C"] = "@class.outer",
+        },
+        goto_previous_start = {
+          ["gM"] = "@function.outer",
+          ["gO"] = "@class.outer",
+        },
+        goto_previous_end = {
+          ["gW"] = "@function.outer",
+          ["[C"] = "@class.outer",
+        },
+      },
+    },
   },
   {
     "nvim-treesitter/nvim-treesitter-context",

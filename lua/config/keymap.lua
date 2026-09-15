@@ -1,6 +1,7 @@
 local utils = require("utilities.utils")
 local b_utils = require("utilities.buffers")
 local gs = require("gitsigns")
+local ts = require("utilities.treesitter-textobjects.utils")
 
 return {
   { "j", "gj", mode = "n" },
@@ -58,21 +59,19 @@ return {
       buffers = vim.tbl_filter(function(buf)
         return buf.hidden == 1
       end, buffers)
+
       for _, buf in ipairs(buffers) do
         local Result = b_utils.Result
-        local res = b_utils.delete(buf)
+        local res = b_utils.delete(buf.bufnr)
         if res == Result.FAIL then
           pcall(vim.notify, "Cancelled.")
-        end
-        if res == Result.SUCCESS then
+        elseif res == Result.SUCCESS then
           count = count + 1
-        end
-        if res == Result.CANCEL then
+        elseif res == Result.CANCEL then
           skip_count = skip_count + 1
         end
-        count = count + 1
-        vim.api.nvim_buf_delete(buf.bufnr, { force = false })
       end
+
       local message = string.format(notification, count)
       if skip_count > 0 then
         message = message .. string.format(skip_notification, skip_count)
@@ -261,6 +260,25 @@ return {
     desc = "Prev Diagnostic",
   },
   { "gO", "<cmd>Trouble symbols toggle<cr>", desc = "Lsp Symbols" },
+  {
+    mode = { "x", "o" },
+    { "am", function() ts.select("@function.outer") end, desc = "Select Around Function" },
+    { "im", function() ts.select("@function.inner") end, desc = "Select In Function" },
+    { "ac", function() ts.select("@class.outer") end, desc = "Select Around Class" },
+    { "ic", function() ts.select("@class.inner") end, desc = "Select In Class" },
+  },
+  {
+    mode = { "n", "x", "o" },
+    { "]m", function() ts.goto("@function.outer") end, desc = "Go To Next Function" },
+    { "[m", function() ts.goto("@function.outer", { direction = "previous" }) end, desc = "Go To Previous Function" },
+    { "]M", function() ts.goto("@function.outer", { position = "end" }) end, desc = "Go To Next Function End" },
+    { "[M", function() ts.goto("@function.outer", { direction = "previous", position = "end" }) end, desc = "Go To Previous Function End" },
+
+    { "]c", function() ts.goto("@class.outer") end, desc = "Go To Next Class" },
+    { "[c", function() ts.goto("@class.outer", { direction = "previous" }) end, desc = "Go To Previous Class" },
+    { "]C", function() ts.goto("@class.outer", { position = "end" }) end, desc = "Go To Next Class End" },
+    { "[C", function() ts.goto("@class.outer", { direction = "previous", position = "end" }) end, desc = "Go To Previous Class End" },
+  },
   {
     "<leader>d",
     group = "DAP",
