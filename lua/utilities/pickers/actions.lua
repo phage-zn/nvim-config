@@ -3,7 +3,7 @@ local finders = require "telescope.finders"
 
 local actions = {}
 
-actions.filter_files = function(prompt_bufnr)
+actions.filter_files = function(prompt_bufnr, opts)
   local results = {}
   local opts = {
     reset_prompt = false
