@@ -1,4 +1,3 @@
----@diagnostic disable: missing-fields
 require("config.neovim-config")
 local logger = require("utilities.logger")
 require("config.lazy")

@@ -6,13 +6,15 @@ vim.o.undofile = true
 vim.o.showmode = false
 vim.o.scrolloff = 20
 vim.o.breakindent = true
-vim.o.signcolumn = "yes"
 vim.o.cursorline = true
-vim.o.fillchars = "vert:║,horiz:═,vertright:╠,vertleft:╣,horizup:╩,horizdown:╦,verthoriz:╬,eob: "
+vim.o.fillchars = "vert:║,horiz:═,vertright:╠,vertleft:╣,horizup:╩,horizdown:╦,verthoriz:╬,eob: ,fold: ,foldopen:,foldclose:,foldsep: ,foldinner: "
 vim.o.lbr = true
+vim.o.foldcolumn = '1'
+vim.o.signcolumn = "yes"
+vim.o.stc = "%s%=%l %C "
 
-vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
-vim.wo[0][0].foldmethod = "expr"
+vim.wo[0][0].foldexpr = vim.treesitter.foldexpr
+vim.wo.foldmethod = "expr"
 
 -- Line numbers
 vim.o.number = true

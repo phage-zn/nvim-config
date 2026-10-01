@@ -41,10 +41,10 @@ return {
 
       local has_other = #buffers > 1
 
+      b_utils.delete(buf, false)
       if has_other and buffers[1] then
         vim.cmd("b" .. buffers[1].bufnr)
       end
-      b_utils.delete(buf, false)
     end,
     desc = "Delete Current Buffer",
   },
@@ -86,9 +86,10 @@ return {
   {
     "<A-s>",
     function()
-      vim.cmd("enew")
+      vim.cmd("e Scratch")
       vim.bo.buftype = "nofile"
-      vim.bo.buflisted = true
+      vim.bo.bufhidden = "hide"
+      vim.bo.swapfile = false
     end,
     desc = "New Scratch Buffer",
   },

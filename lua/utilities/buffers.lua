@@ -1,11 +1,13 @@
 local M = {}
 
+---@enum Result
 M.Result = {
   SUCCESS = {},
   FAIL = {},
   CANCEL = {},
 }
 
+---@return Result
 function M.delete(buf, force)
   if not vim.api.nvim_buf_is_valid(buf) then
     return M.Result.FAIL
@@ -13,7 +15,7 @@ function M.delete(buf, force)
 
   if vim.bo[buf].modified and not force then
     local name = vim.fn.bufname(buf)
-    local ok, choice = pcall(vim.fn.confirm, "Save changes to '" .. name == "" and "Untitled" or name .. "'?",
+    local ok, choice = pcall(vim.fn.confirm, "Save changes to '" .. (name == "" and "Untitled" or name) .. "'?",
       "&Yes\n&No\n&Cancel")
     if not ok or choice == 0 then
       return M.Result.FAIL
@@ -30,6 +32,7 @@ function M.delete(buf, force)
   return M.Result.SUCCESS
 end
 
+---@return Result
 function M.write(buf, filename)
   if not (vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modified) then
     return M.Result.FAIL
