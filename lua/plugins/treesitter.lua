@@ -21,8 +21,10 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(args)
-          autoinstall.autoinstall(args)
-          pcall(vim.treesitter.start)
+          local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+          autoinstall.autoinstall(lang, function()
+            pcall(vim.treesitter.start, args.buf, lang)
+          end)
         end,
       })
     end,

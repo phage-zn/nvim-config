@@ -63,32 +63,34 @@ function M.clear_ignored(args)
   end
 end
 
-function M.autoinstall(args)
+function M.autoinstall(lang, cb)
   local treesitter = require("nvim-treesitter")
   local installed = treesitter.get_installed()
   local available = treesitter.get_available()
-  local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
 
-  if not vim.list_contains(installed, lang) then
-    if vim.tbl_contains(M.get_ignored(), lang) then
-      return
-    end
-
-    if not vim.list_contains(available, lang) then
-      return
-    end
-
-    local response =
-        vim.fn.confirm("Parser available for '" .. lang .. "', install?", "&Yes\n&No\n&Ignore", 1, "Question")
-
-    if response == 1 then
-      pcall(treesitter.install, lang)
-    else
-      if response == 3 then
-        M.ignore_lang(lang)
-      end
-    end
+  if vim.list_contains(installed, lang) then
+    cb()
+    return
   end
+
+  if vim.tbl_contains(M.get_ignored(), lang) or not vim.list_contains(available, lang) then
+    cb()
+    return
+  end
+
+  local _, response = pcall(vim.fn.confirm, "Parser available for '" .. lang .. "', install?", "&Yes\n&No\n&Ignore", 1,
+    "Question")
+
+  if response == 3 then
+    M.ignore_lang(lang)
+  end
+
+  if response == 1 then
+    require("nvim-treesitter").install(lang):await(cb)
+    return
+  end
+
+  cb()
 end
 
 return M
