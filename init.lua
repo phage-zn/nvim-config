@@ -2,6 +2,11 @@ require("config.neovim-config")
 local logger = require("utilities.logger")
 require("config.lazy")
 
+local project_config = '.nvim'
+if vim.secure.read(project_config) then
+  vim.opt.rtp:append(project_config)
+end
+
 vim.api.nvim_create_user_command("UserShowLog", function()
   logger.show_logs()
 end, {

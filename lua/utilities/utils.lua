@@ -32,12 +32,6 @@ function utils.get_file_name(path, sep)
   return segments[#segments]
 end
 
-function utils.toggle_lazygit()
-  local terminal = require("toggleterm.terminal").Terminal
-  local lazygit = terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
-  lazygit:toggle()
-end
-
 function utils.command_exists(cmd)
   local handle = io.popen("which " .. cmd .. " 2>/dev/null")
   if handle then
@@ -65,6 +59,30 @@ function utils.get_fortune()
     end
   end
   return result
+end
+
+---@param choices string[]
+---@return string
+function utils.buildChoiceString(choices)
+  local choiceString = ""
+  for index, choice in ipairs(choices) do
+    choiceString = choiceString .. "&" .. choice
+    if index < #choices then
+      choiceString = choiceString .. "\n"
+    end
+  end
+  return choiceString
+end
+
+---@param msg string
+---@param choices string[]
+---@return string|nil
+function utils.confirm(msg, choices)
+  local ok, choice = pcall(vim.fn.confirm, msg, utils.buildChoiceString(choices))
+  if not ok or choice == 0 then
+    return nil
+  end
+  return choices[choice]
 end
 
 return utils

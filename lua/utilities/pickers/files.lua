@@ -182,7 +182,11 @@ files.live_grep = function(opts)
       previewer = conf.grep_previewer(opts),
       -- TODO: It would be cool to use `--json` output for this
       -- and then we could get the highlight positions directly.
-      sorter = sorters.highlighter_only(opts),
+      -- sorter = sorters.highlighter_only(opts),
+      sorter = conf.prefilter_sorter {
+        tag = "file",
+        sorter = sorters.highlighter_only(opts),
+      },
       attach_mappings = function(_, map)
         map("i", "<c-f>", function (bufnr)
           my_actions.filter_files(bufnr, opts)
@@ -596,7 +600,10 @@ files.tags = function(opts)
       prompt_title = "Tags",
       finder = finders.new_oneshot_job(flatten { "cat", tagfiles }, opts),
       previewer = previewers.ctags.new(opts),
-      sorter = conf.generic_sorter(opts),
+      sorter = conf.prefilter_sorter {
+        tag = "filetype",
+        sorter = conf.generic_sorter(opts),
+      },
       attach_mappings = function()
         action_set.select:enhance {
           post = function()

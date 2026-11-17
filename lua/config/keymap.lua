@@ -1,11 +1,25 @@
-local utils = require("utilities.utils")
 local b_utils = require("utilities.buffers")
+local utils = require("utilities.utils")
 local gs = require("gitsigns")
 local ts = require("utilities.treesitter-textobjects.utils")
+local terminal = require("toggleterm.terminal").Terminal
+
+local lazygit = terminal:new({
+  cmd = "lazygit",
+  dir = "git_dir",
+  hidden = true,
+  direction = "float",
+  on_open = function(term)
+    vim.cmd("startinsert!")
+    vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
+  end
+})
+
+local function toggle_lazygit()
+  lazygit:toggle(vim.o.columns * 0.3)
+end
 
 return {
-  { "j", "gj", mode = "n" },
-  { "k", "gk", mode = "n" },
   { "-", "<cmd>Oil<cr>", desc = "Open Parent Dir" },
   { "<leader><leader>", "<cmd>Alpha<cr>", desc = "Dashboard", icon = "" },
 
@@ -16,11 +30,9 @@ return {
   { "<leader>fs", "<cmd>Telescope live_grep<cr>", desc = "Find String", mode = "n" },
   { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files", mode = "n" },
   { "<leader>fc", "<cmd>Telescope colorscheme<cr>", desc = "Color Scheme", mode = "n" },
-  { "<leader>fm", "<cmd>Telescope marks<cr>", desc = "Mark List", mode = "n" },
+  { "<leader>fm", "<cmd>Telescope lsp_document_symbols symbols={'method','function'}<cr>", desc = "Find Method", mode = "n" },
   { "<leader>fj", "<cmd>Telescope jumplist<cr>", desc = "Jump List", mode = "n" },
-  { "<leader>fJc", function() require("utilities.jar-picker").pick_class() end, desc = "Browse Dep Classes", mode = "n" },
 
-  { "<leader>fJg", function() require("utilities.jar-picker").grep_deps() end, desc = "Grep Dep Sources", mode = "n" },
   { "<leader>f*", "<cmd>Telescope builtin<cr>", desc = "All Commands", mode = "n" },
 
   { "<leader>?", "<cmd>Telescope help_tags<cr>", desc = "Help Tags", mode = "n" },
@@ -35,16 +47,27 @@ return {
       buffers = vim.tbl_filter(function(b)
         return b.bufnr ~= buf
       end, buffers)
+
+      if vim.bo[buf].modified then
+        local name = vim.fn.bufname(buf)
+        local choices = {"Yes", "No", "Cancel"}
+        local choice = utils.confirm("Save changes to '" .. (name == "" and "Untitled" or name) .. "'?", choices)
+        if choice == nil or choice == "Cancel" then
+          return
+        end
+        if choice == "Yes" then
+          vim.api.nvim_buf_call(buf, vim.cmd.write)
+        end
+      end
+
       table.sort(buffers, function(a, b)
         return a.lastused > b.lastused
       end)
 
-      local has_other = #buffers > 1
-
-      b_utils.delete(buf, false)
-      if has_other and buffers[1] then
+      if buffers[1] then
         vim.cmd("b" .. buffers[1].bufnr)
       end
+      vim.api.nvim_buf_delete(buf, { force = true })
     end,
     desc = "Delete Current Buffer",
   },
@@ -60,36 +83,94 @@ return {
         return buf.hidden == 1
       end, buffers)
 
-      for _, buf in ipairs(buffers) do
-        local Result = b_utils.Result
-        local res = b_utils.delete(buf.bufnr)
-        if res == Result.FAIL then
-          pcall(vim.notify, "Cancelled.")
-        elseif res == Result.SUCCESS then
-          count = count + 1
-        elseif res == Result.CANCEL then
-          skip_count = skip_count + 1
+      for _, buffer in ipairs(buffers) do
+        local buf = buffer.bufnr
+        if vim.bo[buf].modified then
+          local name = vim.fn.bufname(buf)
+          local choices = {"Yes", "No", "Skip", "Open", "Cancel"}
+          local choice = utils.confirm("Save changes to '" .. (name == "" and "Untitled" or name) .. "'?", choices)
+          if choice == nil or choice == "Cancel" then
+            return
+          elseif choice == "Open" and buf > 0 then
+            vim.cmd.b { buf }
+            return
+          elseif choice == "Skip" then
+            skip_count = skip_count + 1
+            break;
+          elseif choice == "Yes" then
+            vim.api.nvim_buf_call(buf, vim.cmd.write)
+          end
         end
+        count = count + 1
+        vim.api.nvim_buf_delete(buf, { force = true })
       end
 
       local message = string.format(notification, count)
       if skip_count > 0 then
         message = message .. string.format(skip_notification, skip_count)
       end
-      vim.notify(message)
+      pcall(vim.notify, message, vim.log.levels.INFO, "Closed buffers")
     end,
     desc = "Delete Hidden Buffers",
   },
   { "<A-h>", "<cmd>bp<cr>",                desc = "Go to Previous Buffer" },
   { "<A-l>", "<cmd>bn<cr>",                desc = "Go to Next Buffer" },
   { "<A-b>", "<cmd>Telescope buffers<cr>", desc = "List Buffers",         mode = "n" },
+  { "<A-n>", "<cmd>enew<cr>",              desc = "New File",         mode = "n" },
+  {
+    "<A-N>",
+    function ()
+      pcall(vim.ui.input, {
+        prompt = "Enter filename:",
+        scope = 'cursor'
+      },
+      function (input)
+        b_utils.openBuffer({
+          name = input,
+        })
+      end)
+    end,
+    desc = "New File",
+    mode = "n"
+  },
   {
     "<A-s>",
     function()
-      vim.cmd("e Scratch")
-      vim.bo.buftype = "nofile"
-      vim.bo.bufhidden = "hide"
-      vim.bo.swapfile = false
+      b_utils.openBuffer({
+        name = "Scratch",
+        bufOpts = {
+          buftype = 'nofile',
+          swapfile = false,
+          bufhidden = 'hide',
+        }
+      })
+    end,
+    desc = "New Scratch Buffer",
+  },
+  {
+    "<A-S>",
+    function ()
+      pcall(vim.ui.select,
+      vim.fn.getcompletion('', 'filetype'),
+      {
+        prompt = "Enter filetype:",
+        scope = 'window',
+        completion = 'filetype'
+      },
+      function (input)
+        if (input == nil) then
+          return
+        end
+        b_utils.openBuffer({
+          name = "Scratch",
+          bufOpts = {
+            buftype = 'nofile',
+            swapfile = false,
+            bufhidden = 'hide',
+            filetype = input or 'text'
+          }
+        })
+      end)
     end,
     desc = "New Scratch Buffer",
   },
@@ -114,6 +195,7 @@ return {
 
   -- ToggleTerm Functions
   { "<leader>t", group = "Terminal" },
+  { "<leader>ta", "<cmd>Atac<cr>", desc = "Atac" },
   { "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", desc = "Float" },
   { "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", desc = "Horizontal" },
   { "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", desc = "Vertical" },
@@ -132,7 +214,9 @@ return {
   { "<leader>gB", gs.blame,       desc = "Blame buffer" },
   {
     "<leader>gl",
-    utils.toggle_lazygit,
+    function ()
+      toggle_lazygit()
+    end,
     desc = "Lazygit",
   },
   { "<leader>gc", gs.show_commit, desc = "Show commit" },
@@ -148,26 +232,26 @@ return {
   { "<leader>q",  group = "Quickfix" },
   { "<leader>qo", "<cmd>copen<cr>",    desc = "Open" },
   { "<leader>qc", "<cmd>cclose<cr>",   desc = "Close" },
-  { "<leader>qn", "<cmd>cnext<cr>",    desc = "Next" },
-  { "<leader>qp", "<cmd>cprev<cr>",    desc = "Prev" },
   { "<leader>qh", "<cmd>chistory<cr>", desc = "History" },
   {
     "<leader>qd",
     function()
-      local cmd = vim.fn.input("cdo: ")
-      if cmd ~= "" then
-        vim.cmd("cdo " .. cmd)
-      end
+      vim.ui.input({ prompt = "[Entry] cmd: " }, function (input)
+        if input ~= "" then
+          vim.cmd("cdo " .. input)
+        end
+      end)
     end,
-    desc = "Run cmd on each item",
+    desc = "Run cmd on each entry",
   },
   {
     "<leader>qf",
     function()
-      local cmd = vim.fn.input("cfdo: ")
-      if cmd ~= "" then
-        vim.cmd("cfdo " .. cmd)
-      end
+      vim.ui.input({ prompt = "[File] cmd: " }, function (input)
+        if input ~= "" then
+          vim.cmd("cfdo " .. input)
+        end
+      end)
     end,
     desc = "Run cmd on each file",
   },
@@ -178,10 +262,6 @@ return {
     end,
     desc = "Add current line to quickfix",
   },
-  { "gq", "<cmd>cnext<cr>", desc = "Next Quickfix Item" },
-  { "gQ", "<cmd>cprev<cr>", desc = "Prev Quickfix Item" },
-  { "gl", "<cmd>lnext<cr>", desc = "Next Loc Item" },
-  { "gL", "<cmd>lprev<cr>", desc = "Prev Loc Item" },
 
   {
     "<Esc>",
@@ -206,7 +286,13 @@ return {
   { "|", "<cmd>vsplit<cr>", desc = "Vertical Split" },
   { "\\", "<cmd>split<cr>", desc = "Horizontal Split" },
 
-  { "K", vim.lsp.buf.hover, desc = "Hover Documentation" },
+  { "K", function()
+    --- @type vim.lsp.buf.hover.Opts
+    local config = {
+      border="rounded"
+    }
+    vim.lsp.buf.hover(config)
+  end, desc = "Hover Documentation" },
 
   { "<leader>l", group = "LSP", icon = "󱁼" },
   {
@@ -267,6 +353,8 @@ return {
     { "im", function() ts.select("@function.inner") end, desc = "Select In Function" },
     { "ac", function() ts.select("@class.outer") end, desc = "Select Around Class" },
     { "ic", function() ts.select("@class.inner") end, desc = "Select In Class" },
+    { "aa", function() ts.select("@parameter.outer") end, desc = "Select In Parameter" },
+    { "ia", function() ts.select("@parameter.inner") end, desc = "Select In Parameter" },
   },
   {
     mode = { "n", "x", "o" },
@@ -281,7 +369,75 @@ return {
     { "[C", function() ts.goto("@class.outer", { direction = "previous", position = "end" }) end, desc = "Go To Previous Class End" },
   },
   {
+    mode = { "n" },
+    { "<leader>ln", function() ts.swap("@parameter.inner") end, desc = "Swap parameter with next" },
+    { "<leader>lp", function() ts.swap("@parameter.inner", { direction = "previous" }) end, desc = "Swap parameter with previous" },
+  },
+  {
     "<leader>d",
     group = "DAP",
+  },
+  {
+    "<leader>du",
+    function()
+      require("dapui").toggle({})
+    end,
+    desc = "Dap UI",
+  },
+  {
+    "<leader>db",
+    "<cmd>DapToggleBreakpoint<cr>",
+    desc = "Toggle Breakpoint",
+  },
+  {
+    "<leader>dc",
+    "<cmd>DapContinue<cr>",
+    desc = "Continue",
+  },
+  {
+    "<leader>dC",
+    function()
+      require("dap").run_to_cursor()
+    end,
+    desc = "Run to Cursor",
+  },
+  {
+    "<leader>dt",
+    function()
+      pcall(vim.ui.select, {"Test Class", "Test Method", "Pick Test"},
+      {
+        prompt = "Choose Test To Run:",
+      },
+      function (input)
+        if (input == nil) then
+          return
+        end
+        if input == "Test Class" then
+          require('jdtls').test_class()
+        elseif input == "Test Method" then
+          require('jdtls').test_nearest_method()
+        elseif input == "Pick Test" then
+          require('jdtls').pick_test()
+        end
+      end)
+    end,
+    desc = "Run to Cursor",
+  },
+  {
+    "<leader>dp",
+    "<cmd>DapPause<cr>",
+    desc = "Pause",
+  },
+  {
+    "<leader>ds",
+    function()
+      require("dap").close()
+    end,
+    desc = "Stop",
+  },
+  {
+    "<leader>dT",
+    "<cmd>DapTerminate<cr>",
+    desc = "Terminate",
   },
 }

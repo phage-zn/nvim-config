@@ -3,21 +3,33 @@ return {
   "nvim-lualine/lualine.nvim",
   dependencies = { "nvim-tree/nvim-web-devicons" },
   opts = {
+    tabline = {
+      lualine_a = {
+        {
+          'tabs',
+          mode = 1,
+          path = 0,
+          use_mode_colors = true,
+        },
+      },
+      lualine_x = {},
+      lualine_z = {
+        {
+          "branch",
+          on_click = utils.toggle_lazygit,
+        },
+      }
+    },
     options = {
       theme = "auto",
       component_separators = { left = "", right = "" },
       section_separators = { left = "", right = "" },
       globalstatus = true,
-      disabled_filetypes = { statusline = { "dashboard", "alpha", "starter", "oil" } },
+      disabled_filetypes = { statusline = { "dashboard", "alpha", "starter" } },
     },
     sections = {
       lualine_a = { "mode" },
-      lualine_b = {
-        {
-          "branch",
-          on_click = utils.toggle_lazygit,
-        },
-      },
+      lualine_b = {},
       lualine_c = {
         {
           "filetype",
@@ -48,6 +60,12 @@ return {
           require("lazy.status").updates,
           cond = require("lazy.status").has_updates,
         },
+      },
+      lualine_y = {
+        {
+          "branch",
+          on_click = utils.toggle_lazygit,
+        },
         {
           "diff",
           source = function()
@@ -62,17 +80,12 @@ return {
           end,
         },
       },
-      lualine_y = {
-        { "progress", separator = " ",                  padding = { left = 1, right = 0 } },
+      lualine_z = {
+        { "progress", separator = "",                   padding = { left = 1, right = 0 } },
         { "location", padding = { left = 0, right = 1 } },
       },
-      lualine_z = {
-        function()
-          return "  " .. os.date("%R")
-        end,
-      },
     },
-    extensions = { "lazy" },
+    extensions = { "lazy", "oil", "quickfix", "symbols-outline", "nvim-dap-ui", "toggleterm" },
   },
   config = function(_, opts)
     local lualine_require = require("lualine_require")

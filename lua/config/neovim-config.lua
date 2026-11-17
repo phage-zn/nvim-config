@@ -7,7 +7,8 @@ vim.o.showmode = false
 vim.o.scrolloff = 20
 vim.o.breakindent = true
 vim.o.cursorline = true
-vim.o.fillchars = "vert:║,horiz:═,vertright:╠,vertleft:╣,horizup:╩,horizdown:╦,verthoriz:╬,eob: ,fold: ,foldopen:,foldclose:,foldsep: ,foldinner: "
+vim.o.fillchars =
+"vert:║,horiz:═,vertright:╠,vertleft:╣,horizup:╩,horizdown:╦,verthoriz:╬,eob: ,fold: ,foldopen:,foldclose:,foldsep: ,foldinner: "
 vim.o.lbr = true
 vim.o.foldcolumn = '1'
 vim.o.signcolumn = "yes"
@@ -15,6 +16,13 @@ vim.o.stc = "%s%=%l %C "
 
 vim.wo[0][0].foldexpr = vim.treesitter.foldexpr
 vim.wo.foldmethod = "expr"
+vim.wo.foldtext = function()
+  return {
+    { vim.fn.getline(vim.v.foldstart), "Folded" },
+    { "   ", "Comment" }
+  }
+end
+vim.wo.foldlevel = 99
 
 -- Line numbers
 vim.o.number = true
@@ -56,3 +64,5 @@ vim.diagnostic.config({
     prefix = "",
   },
 })
+
+vim.o.showtabline = 2

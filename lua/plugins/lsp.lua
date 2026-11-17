@@ -19,19 +19,17 @@ return {
     config = function()
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+      local servers = {
+        "biome", "eslint", "jdtls", "lua_ls", "ts_ls", "yamlls"
+      }
       vim.lsp.config("*", {
         capabilities = lsp_capabilities,
       })
 
       require("mason").setup()
-      local mason_config = require("config.lsp-config")
       require("mason-lspconfig").setup({
-        ensure_installed = vim.tbl_keys(mason_config.servers),
+        ensure_installed = servers,
       })
-
-      for server_name, server_config in pairs(mason_config.servers) do
-        vim.lsp.config(server_name, server_config)
-      end
     end,
   },
   { "mfussenegger/nvim-jdtls" },

@@ -33,4 +33,22 @@ function M.select(object, opts)
 end
 
 
+---@class SwapOpts
+---@field direction? "previous" | "next"
+---@field group? string
+
+---@param object string
+---@param opts? SwapOpts
+function M.swap(object, opts)
+ local ts = require("nvim-treesitter-textobjects.swap")
+  local direction = opts and opts.direction or "next"
+  local group = opts and opts.group
+  local fn = "swap_" .. direction
+  if ts[fn] then
+    ts[fn](object, group)
+  else
+    vim.notify(fn .. " does not exist")
+  end
+end
+
 return M

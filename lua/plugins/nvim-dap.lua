@@ -29,40 +29,4 @@ return {
       },
     }
   end,
-  keys = {
-    {
-      "<leader>db",
-      "<cmd>DapToggleBreakpoint<cr>",
-      desc = "Toggle Breakpoint",
-    },
-    {
-      "<leader>dc",
-      "<cmd>DapContinue<cr>",
-      desc = "Continue",
-    },
-    {
-      "<leader>dC",
-      function()
-        require("dap").run_to_cursor()
-      end,
-      desc = "Run to Cursor",
-    },
-    {
-      "<leader>dp",
-      "<cmd>DapPause<cr>",
-      desc = "Pause",
-    },
-    {
-      "<leader>ds",
-      function()
-        require("dap").close()
-      end,
-      desc = "Stop",
-    },
-    {
-      "<leader>dT",
-      "<cmd>DapTerminate<cr>",
-      desc = "Terminate",
-    },
-  },
 }

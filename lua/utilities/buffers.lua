@@ -16,11 +16,14 @@ function M.delete(buf, force)
   if vim.bo[buf].modified and not force then
     local name = vim.fn.bufname(buf)
     local ok, choice = pcall(vim.fn.confirm, "Save changes to '" .. (name == "" and "Untitled" or name) .. "'?",
-      "&Yes\n&No\n&Cancel")
+      "&Yes\n&No\n&Cancel\n&Open")
     if not ok or choice == 0 then
       return M.Result.FAIL
     end
-    if choice == 3 then
+    if choice == 4 and buf > 0 then
+      vim.cmd.b { buf }
+    end
+    if choice == 3 or choice == 4 then
       return M.Result.CANCEL
     end
     if choice == 1 then
@@ -49,6 +52,53 @@ function M.write(buf, filename)
     vim.api.nvim_buf_call(buf, vim.cmd.write)
   end
 
+  return M.Result.SUCCESS
+end
+
+---@class FileOpts
+---@field name? string
+---@field bufOpts? vim.bo
+
+---@param opts FileOpts
+M.openBuffer = function(opts)
+  opts = opts or {}
+  if opts.name == nil then
+    return
+  end
+  if opts.name == "" then
+    vim.cmd("enew")
+  else
+    vim.cmd("e " .. opts.name)
+  end
+  if opts.bufOpts then
+    for key, value in pairs(opts.bufOpts) do
+      vim.api.nvim_set_option_value(key, value, {
+        buf = 0,
+        scope = 'local'
+      })
+    end
+  end
+end
+
+M.closeTab = function()
+  local force = false
+  if vim.bo.modified and not force then
+    local name = vim.fn.bufname()
+    local ok, choice = pcall(vim.fn.confirm, "Save changes to '" .. (name == "" and "Untitled" or name) .. "'?",
+      "&Yes\n&No\n&Cancel")
+    if not ok or choice == 0 then
+      return M.Result.FAIL
+    end
+    if choice == 3 then
+      return M.Result.CANCEL
+    end
+    if choice == 1 then
+      vim.cmd.write {}
+    end
+  end
+
+  vim.cmd.bd { bang = true }
+  vim.cmd.tabc {}
   return M.Result.SUCCESS
 end
 

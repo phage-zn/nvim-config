@@ -44,6 +44,7 @@ return {
       table.insert(vimgrep_arguments, "--hidden")
       table.insert(vimgrep_arguments, "--glob")
       table.insert(vimgrep_arguments, "!**/.git/*")
+ -- rg --color=never --no-heading --with-filename --line-number --column --smart-case
       opts.defaults = {
         vimgrep_arguments = vimgrep_arguments,
       }
